@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.opservice.dao.ProductMapper">
+
+	<resultMap type="com.yellowcar.entities.Product" id="productResultMap">
+		<id column="id" property="id" />
+		<result column="order" property="order" />
+        <result column="service_info" property="serviceInfo" />
+        <result column="path_id" property="pathId" />
+        <result column="includes" property="includes" />
+        <result column="notice" property="notice" />
+        <result column="round_trip" property="roundTrip" />
+        <result column="order_tips" property="orderTips" />
+        <result column="min_num" property="minNum" />
+		<result column="status" property="status" />
+        <result column="time_choice" property="timeChoice" />
+        <result column="create_time" property="createTime" />
+		<result column="modify_time" property="modifyTime" />
+	</resultMap>
+
+	<update id="update" parameterType="com.yellowcar.entities.Product">
+		update `product`
+		<trim prefix="set" suffixOverrides=",">
+            <if test="order != null"> `order` = #{order},</if>
+			<if test="serviceInfo != null"> `service_info` = #{serviceInfo},</if>
+            <if test="pathId != null"> `path_id` = #{pathId},</if>
+            <if test="includes != null"> `includes` = #{includes},</if>
+            <if test="notice != null"> `notice` = #{notice},</if>
+            <if test="roundTrip != null"> `round_trip` = #{roundTrip},</if>
+            <if test="orderTips != null"> `order_tips` = #{orderTips},</if>
+            <if test="minNum != null"> `min_num` = #{minNum},</if>
+			<if test="status != null"> `status` = #{status},</if>
+            <if test="timeChoice != null"> `time_choice` = #{timeChoice},</if>
+			<if test="createTime != null"> `create_time` = #{createTime},</if>
+			<if test="modifyTime != null"> `modify_time` = #{modifyTime},</if>
+		</trim>
+		where `id` = #{id}
+	</update>
+
+	<insert id="save" parameterType="com.yellowcar.entities.Product"
+		useGeneratedKeys="true" keyProperty="id">
+		insert into `product`(
+		<trim suffixOverrides=",">
+            <if test="order != null"> `order` ,</if>
+			<if test="serviceInfo != null"> `service_info` ,</if>
+			<if test="pathId != null"> `path_id` ,</if>
+            <if test="includes != null"> `includes` ,</if>
+            <if test="notice != null"> `notice` ,</if>
+            <if test="roundTrip != null"> `round_trip` ,</if>
+            <if test="orderTips != null"> `order_tips` ,</if>
+            <if test="minNum != null"> `min_num` ,</if>
+			<if test="status != null"> `status` ,</if>
+            <if test="timeChoice != null"> `time_choice` ,</if>
+			<if test="createTime != null"> `create_time` ,</if>
+			<if test="modifyTime != null"> `modify_time` ,</if>
+		</trim>
+		)values(
+		<trim suffixOverrides=",">
+            <if test="order != null"> #{order} ,</if>
+			<if test="serviceInfo != null"> #{serviceInfo} ,</if>
+			<if test="pathId != null"> #{pathId} ,</if>
+            <if test="includes != null"> #{includes} ,</if>
+            <if test="notice != null"> #{notice} ,</if>
+            <if test="roundTrip != null"> #{roundTrip} ,</if>
+            <if test="orderTips != null"> #{orderTips} ,</if>
+            <if test="minNum != null"> #{minNum} ,</if>
+			<if test="status != null"> #{status} ,</if>
+            <if test="timeChoice != null"> #{timeChoice} ,</if>
+			<if test="createTime != null"> #{createTime} ,</if>
+			<if test="modifyTime != null"> #{modifyTime} ,</if>
+		</trim>
+		)
+	</insert>
+
+
+	<select id="getById" parameterType="java.lang.Long" resultMap="productResultMap">
+        select *
+        from `product`
+        where `id` = #{id}
+    </select>
+
+
+    <select id="getBy" parameterType="com.yellowcar.entities.Product" resultMap="productResultMap">
+        select *
+        from `product`
+        <trim prefix="where" prefixOverrides="AND|OR">
+            <if test="id !=null ">
+                `id` = #{id}
+            </if>
+            <if test="pathId != null ">
+                AND `path_id` = #{pathId}
+            </if>
+            <if test="status != null ">
+                AND `status` = #{status}
+            </if>
+            <if test="minNum != null ">
+                AND `min_num` = #{minNum}
+            </if>
+        </trim>
+    </select>
+
+
+
+    <select id="getByPathId" parameterType="java.lang.Long" resultMap="productResultMap">
+        select *
+        from `product`
+        where `path_id`=#{pathId} and status=1
+    </select>
+    <!--fan加 -->
+    <select id="getProducts" resultMap="productResultMap">
+        select * from `product`
+    </select>
+</mapper>

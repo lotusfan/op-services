@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.opservice.dao.ServicePackageMapper">
+
+    <resultMap type="com.yellowcar.entities.ServicePackage" id="servicePackageResultMap">
+        <id column="id" property="id" />
+        <result column="service_id" property="serviceId" />
+        <result column="service_package_desc" property="servicePackageDesc" />
+        <result column="unit" property="unit" />
+        <result column="min_num" property="minNum" />
+        <result column="status" property="status" />
+        <result column="remarks" property="remarks" />
+        <result column="create_time" property="createTime" />
+        <result column="modify_time" property="modifyTime" />
+    </resultMap>
+
+
+    <select id="getServicePackageById" parameterType="java.lang.Long" resultMap="servicePackageResultMap">
+        select *
+        from `service_package`
+        where id= #{id}
+    </select>
+    <select id="getSPByServiceId" parameterType="java.lang.Long" resultMap="servicePackageResultMap">
+        select *
+        from `service_package`
+        where service_id = #{serviceId}
+    </select>
+
+</mapper>

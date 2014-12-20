@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.opservice.dao.OrderSubsidiaryMapper">
+
+	<resultMap type="com.yellowcar.entities.OrderSubsidiary" id="orderSubsidiaryResultMap">
+		<id column="id" property="id" />
+        <result column="order_code" property="orderCode" />
+        <result column="order_source" property="orderSource" />
+        <result column="out_id" property="outId" />
+        <result column="phone_local" property="phoneLocal" />
+        <result column="receive_place" property="receivePlace" />
+        <result column="customer_name" property="customerName" />
+        <result column="customer_email" property="customerEmail" />
+
+        <result column="create_time" property="createTime" />
+        <result column="modify_time" property="modifyTime" />
+
+
+        <result column="car_type" property="carType" />
+        <result column="flight_num" property="flightNum" />
+        <result column="flight_time" property="flightTime" />
+        <result column="task" property="task" />
+        <result column="remarks_place" property="remarksPlace" />
+        <result column="remind" property="remind" />
+        <result column="image_num" property="imageNum" />
+        <result column="source_order_time" property="sourceOrderTime" />
+	</resultMap>
+
+
+    <select id="getOrderSubsidiary" parameterType="java.lang.String" resultMap="orderSubsidiaryResultMap">
+        select *
+        from `order_subsidiary`
+        where order_code = #{order_code}
+    </select>
+
+    <insert id="insertOrderSubsidiary" parameterType="com.yellowcar.entities.OrderSubsidiary"
+            useGeneratedKeys="true" keyProperty="id">
+        insert into `order_subsidiary`(
+        <trim prefixOverrides="," suffixOverrides=",">
+            <if test="orderCode != null"> `order_code` ,</if>
+            <if test="orderSource != null"> `order_source` ,</if>
+            <if test="outId != null"> `out_id` ,</if>
+            <if test="phoneLocal != null"> `phone_local` ,</if>
+            <if test="receivePlace != null"> `receive_place` ,</if>
+            <if test="customerName != null"> `customer_name` ,</if>
+            <if test="customerEmail != null"> `customer_email` ,</if>
+            <if test="carType != null"> `car_type` ,</if>
+            <if test="flightNum != null"> `flight_num` ,</if>
+            <if test="flightTime != null"> `flight_time` ,</if>
+            <if test="task != null"> `task` ,</if>
+            <if test="remarksPlace != null"> `remarks_place` ,</if>
+            <if test="remind != null"> `remind` ,</if>
+            <if test="imageNum != null"> `image_num` ,</if>
+            <if test="sourceOrderTime != null"> `source_order_time` ,</if>
+        </trim>
+        )values(
+        <trim prefixOverrides="," suffixOverrides=",">
+            <if test="orderCode != null"> #{orderCode} ,</if>
+            <if test="orderSource != null"> #{orderSource} ,</if>
+            <if test="outId != null"> #{outId} ,</if>
+            <if test="phoneLocal != null"> #{phoneLocal} ,</if>
+            <if test="receivePlace != null"> #{receivePlace} ,</if>
+            <if test="customerName != null"> #{customerName} ,</if>
+            <if test="customerEmail != null"> #{customerEmail} ,</if>
+            <if test="carType != null"> #{carType} ,</if>
+            <if test="flightNum != null"> #{flightNum} ,</if>
+            <if test="flightTime != null"> #{flightTime} ,</if>
+            <if test="task != null"> #{task} ,</if>
+            <if test="remarksPlace != null"> #{remarksPlace} ,</if>
+            <if test="remind != null"> #{remind} ,</if>
+            <if test="imageNum != null"> #{imageNum} ,</if>
+            <if test="sourceOrderTime != null"> #{sourceOrderTime} ,</if>
+        </trim>
+        )
+    </insert>
+    <!--
+	<update id="updateUserById" parameterType="com.yellowcar.entities.User">
+		update `user`
+		<trim prefix="set" suffixOverrides=",">
+			<if test="name != null"> `name` = #{name},</if>
+			<if test="englishName != null"> `english_name` = #{englishName},</if>
+			<if test="phone != null"> phone = #{phone},</if>
+            <if test="localPhone != null"> local_phone = #{localPhone},</if>
+			<if test="weixin != null"> weixin = #{weixin},</if>
+            <if test="qq != null"> qq = #{qq},</if>
+			<if test="info != null"> info = #{info},</if>
+		</trim>
+		where id = #{id}
+	</update>
+
+	<update id="updateUserByPhoneNumber" parameterType="com.yellowcar.entities.User">
+		update `user`
+		<trim prefix="set" suffixOverrides=",">
+			<if test="name != null"> `name` = #{name},</if>
+			<if test="englishName != null"> `english_name` = #{englishName},</if>
+			<if test="phone != null"> phone = #{phone},</if>
+			<if test="localPhone != null"> local_phone = #{localPhone},</if>
+			<if test="weixin != null"> weixin = #{weixin},</if>
+			<if test="qq != null"> qq = #{qq},</if>
+			<if test="info != null"> info = #{info},</if>
+		</trim>
+		where phone = #{phone}
+	</update>
+
+	<insert id="saveUser" parameterType="com.yellowcar.entities.User"
+		useGeneratedKeys="true" keyProperty="id">
+		insert into `user`(
+		<trim suffixOverrides=",">
+			<if test="name != null"> `name` ,</if>
+			<if test="englishName != null"> english_name ,</if>
+			<if test="phone != null"> phone ,</if>
+            <if test="localPhone != null"> local_phone ,</if>
+			<if test="weixin != null"> weixin ,</if>
+            <if test="qq != null"> qq ,</if>
+			<if test="info != null"> info ,</if>
+			<if test="createTime != null"> create_time ,</if>
+		</trim>
+		)values(
+		<trim suffixOverrides=",">
+			<if test="name != null"> #{name} ,</if>
+			<if test="englishName != null"> #{englishName} ,</if>
+			<if test="phone != null"> #{phone} ,</if>
+            <if test="localPhone != null"> #{localPhone} ,</if>
+			<if test="weixin != null"> #{weixin} ,</if>
+            <if test="qq != null"> #{qq} ,</if>
+			<if test="info != null"> #{info} ,</if>
+			<if test="createTime != null"> #{createTime} ,</if>
+		</trim>
+		)
+	</insert>
+
+	<insert id="registerOnDuplicateUpdateByPhoneNumber" parameterType="com.yellowcar.entities.User"
+			useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO `user`(
+		<trim suffixOverrides=",">
+			<if test="name != null"> `name` ,</if>
+			<if test="englishName != null"> english_name ,</if>
+			<if test="phone != null"> phone ,</if>
+			<if test="localPhone != null"> local_phone ,</if>
+			<if test="weixin != null"> weixin ,</if>
+			<if test="qq != null"> qq ,</if>
+			<if test="info != null"> info ,</if>
+			<if test="createTime != null"> create_time ,</if>
+		</trim>
+		)values(
+		<trim suffixOverrides=",">
+			<if test="name != null"> #{name} ,</if>
+			<if test="englishName != null"> #{englishName} ,</if>
+			<if test="phone != null"> #{phone} ,</if>
+			<if test="localPhone != null"> #{localPhone} ,</if>
+			<if test="weixin != null"> #{weixin} ,</if>
+			<if test="qq != null"> #{qq} ,</if>
+			<if test="info != null"> #{info} ,</if>
+			<if test="createTime != null"> #{createTime} ,</if>
+		</trim>
+		) ON DUPLICATE KEY UPDATE
+		<trim suffixOverrides=",">
+			<if test="name != null"> `name` = #{name},</if>
+			<if test="englishName != null"> `english_name` = #{englishName},</if>
+			<if test="phone != null"> phone = #{phone},</if>
+			<if test="localPhone != null"> local_phone = #{localPhone},</if>
+			<if test="weixin != null"> weixin = #{weixin},</if>
+			<if test="qq != null"> qq = #{qq},</if>
+			<if test="info != null"> info = #{info},</if>
+		</trim>
+	</insert>
+
+
+	<select id="getUserByPhoneNumber" parameterType="java.util.Map" resultMap="userResultMap">
+		SELECT *
+		FROM `user`
+		where phone = #{phone}
+	</select>
+	-->
+</mapper>

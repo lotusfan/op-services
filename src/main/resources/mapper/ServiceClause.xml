@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.opservice.dao.ServiceClauseMapper">
+
+    <resultMap type="com.yellowcar.entities.ServiceClause" id="serviceClauseResultMap">
+        <id column="id" property="id" />
+        <result column="city_code" property="cityCode" />
+        <result column="title" property="title" />
+        <result column="content" property="content" />
+        <result column="origin_price" property="originPrice" />
+        <result column="price" property="price" />
+        <result column="playtime" property="playtime" />
+        <result column="type" property="type" />
+        <result column="tags" property="tags" />
+        <result column="recommend" property="recommend" />
+        <result column="min_num" property="minNum" />
+        <result column="unit" property="unit" />
+        <result column="status" property="status" />
+        <result column="create_time" property="createTime" />
+        <result column="modify_time" property="modifyTime" />
+    </resultMap>
+
+
+    <select id="getServiceClauses" resultMap="serviceClauseResultMap">
+        select * from `service`
+    </select>
+
+</mapper>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.opservice.dao.ServicePPCalendarMapper">
+
+    <resultMap type="com.yellowcar.entities.ServicePackagePriceCalendar" id="servicePPCalendarResultMap">
+        <id column="id" property="id"/>
+        <result column="service_package_id" property="servicePackageId"/>
+        <result column="price" property="price"/>
+        <result column="year" property="year"/>
+        <result column="month" property="month"/>
+        <result column="day" property="day"/>
+        <result column="today_time" property="todayTime"/>
+
+        <result column="create_time" property="createTime"/>
+        <result column="modify_time" property="modifyTime"/>
+
+    </resultMap>
+
+
+    <select id="getSPPCById" parameterType="java.lang.Long" resultMap="servicePPCalendarResultMap">
+        select *
+        from `service_package_price_calendar`
+        where service_package_id= #{servicePackageId}
+    </select>
+    <select id="getServicePPCalendarBy" parameterType="com.yellowcar.entities.ServicePackagePriceCalendar"
+            resultMap="servicePPCalendarResultMap">
+        select *
+        from service_package_price_calendar
+        <!--
+        where sppc.service_package_id = #{servicePackageId} and sppc.year = #{year} and sppc.month = #{month} and sppc.day = #{day}
+-->
+
+        <trim prefix="where" prefixOverrides="and|or">
+
+            <if test="id != null and id != 0">
+                `id` = #{id}
+            </if>
+            <if test="servicePackageId != null">
+                `service_package_id` = #{servicePackageId}
+            </if>
+            <if test="year != null">
+                and `year` = #{year}
+            </if>
+            <if test="month != null">
+                and `month` = #{month}
+            </if>
+            <if test="day != null">
+                and `day` = #{day}
+            </if>
+
+        </trim>
+
+
+    </select>
+
+</mapper>

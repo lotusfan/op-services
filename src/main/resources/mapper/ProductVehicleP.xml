@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.opservice.dao.ProductVehiclePackageMapper">
+
+    <resultMap type="com.yellowcar.entities.ProductVehiclePackage" id="ProductVehiclePackageResultMap">
+        <id column="id" property="id" />
+        <result column="product_id" property="productId" />
+        <result column="vehicle_package_id" property="vehiclePackageId" />
+        <result column="status" property="status" />
+        <result column="create_time" property="createTime" />
+        <result column="modify_time" property="modifyTime" />
+    </resultMap>
+    <select id="getPVPByProductId" parameterType="java.lang.Long" resultMap="ProductVehiclePackageResultMap">
+        select *
+        from `product_vehicle_package`
+        where product_id = #{productId}
+    </select>
+
+</mapper>

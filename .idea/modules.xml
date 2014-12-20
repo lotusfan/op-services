@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/../common/common.iml" filepath="$PROJECT_DIR$/../common/common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/op-service.iml" filepath="$PROJECT_DIR$/op-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../op-web/op-web.iml" filepath="$PROJECT_DIR$/../op-web/op-web.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../parent/parent.iml" filepath="$PROJECT_DIR$/../parent/parent.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../user-service/user-service.iml" filepath="$PROJECT_DIR$/../user-service/user-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../user-web/user-web.iml" filepath="$PROJECT_DIR$/../user-web/user-web.iml" />
+    </modules>
+  </component>
+</project>
+

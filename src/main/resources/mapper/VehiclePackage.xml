@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.opservice.dao.VehiclePackageMapper">
+
+	<resultMap type="com.yellowcar.entities.VehiclePackage" id="vehiclePackageResultMap">
+		<id column="id" property="id" />
+		<result column="vehicle_id" property="vehicleId" />
+		<result column="unit" property="unit" />
+        <result column="min_num" property="minNum" />
+		<result column="status" property="status" />
+		<result column="create_time" property="createTime" />
+		<result column="modify_time" property="modifyTime" />
+	</resultMap>
+
+
+    <!-- 用车套装的列表视图 -->
+    <resultMap type="com.yellowcar.view.VehiclePackageListView" id="vehiclePackageListViewResultMap">
+        <id column="id" property="id" />
+        <result column="vehicle_id" property="vehicleId" />
+        <result column="unit" property="unit" />
+        <result column="min_num" property="minNum" />
+        <result column="pic" property="pic" />
+        <result column="title" property="title" />
+        <result column="city_code" property="cityCode" />
+        <result column="info" property="info" />
+        <result column="facility" property="facility" />
+        <result column="capacity" property="capacity" />
+    </resultMap>
+
+
+	<update id="update" parameterType="com.yellowcar.entities.VehiclePackage">
+		update `vehicle_package`
+		<trim prefix="set" suffixOverrides=",">
+			<if test="vehicleId != null"> `vehicle_id` = #{vehicleId},</if>
+			<if test="unit != null"> `unit` = #{unit},</if>
+            <if test="minNum != null"> `min_num` = #{minNum},</if>
+			<if test="status != null"> `status` = #{status},</if>
+			<if test="createTime != null"> `create_time` = #{createTime},</if>
+			<if test="modifyTime != null"> `modify_time` = #{modifyTime},</if>
+		</trim>
+		where id = #{id}
+	</update>
+
+	<insert id="save" parameterType="com.yellowcar.entities.VehiclePackage"
+		useGeneratedKeys="true" keyProperty="id">
+		insert into `vehicle_package`(
+		<trim suffixOverrides=",">
+			<if test="vehicleId != null"> `vehicle_id` ,</if>
+			<if test="unit != null"> `unit` ,</if>
+            <if test="minNum != null"> `min_num` ,</if>
+			<if test="status != null"> `status` ,</if>
+			<if test="createTime != null"> `create_time` ,</if>
+			<if test="modifyTime != null"> `modify_time` ,</if>
+		</trim>
+		)values(
+		<trim suffixOverrides=",">
+			<if test="vehicleId != null"> #{vehicleId} ,</if>
+			<if test="unit != null"> #{unit} ,</if>
+            <if test="minNum != null"> #{minNum} ,</if>
+			<if test="status != null"> #{status} ,</if>
+			<if test="createTime != null"> #{createTime} ,</if>
+			<if test="modifyTime != null"> #{modifyTime} ,</if>
+		</trim>
+		)
+	</insert>
+
+
+	<select id="getById" parameterType="java.lang.Long" resultMap="vehiclePackageResultMap">
+        select *
+        from `vehicle_package`
+        where id = #{id}
+    </select>
+
+
+    <select id="getBy" parameterType="com.yellowcar.entities.VehiclePackage" resultMap="vehiclePackageResultMap">
+        select *
+        from `vehicle_package`
+        <trim prefix="where" prefixOverrides="AND|OR">
+            <if test="id !=null ">
+                `id` = #{id}
+            </if>
+            <if test="vehicleId != null ">
+                AND `vehicle_id` = #{vehicleId}
+            </if>
+            <if test="status != null ">
+                AND `status` = #{status}
+            </if>
+            <if test="minNum != null ">
+                AND `min_num` = #{minNum}
+            </if>
+        </trim>
+    </select>
+
+
+    <!-- 根据产品id获取与该产品相匹配的用车套装列表 -->
+    <select id="getByProductId" parameterType="java.lang.Long" resultMap="vehiclePackageResultMap">
+        select * from `vehicle_package`
+	      where
+        `id` in (
+	      select `veichle_package_id`
+		    from `product_vehicle_package`
+	      where `status`=1 and `product_id`=#{productId}
+        )
+        order by v1.`id`
+    </select>
+
+
+
+    <!-- 根据产品id获取与该产品相匹配的用车套装视图列表 -->
+    <select id="getListViewByProductId" parameterType="java.lang.Long" resultMap="vehiclePackageListViewResultMap">
+        select
+          v1.`id` as `id`, v1.`vehicle_id` as `vehicle_id`, v1.`unit` as `unit`, v1.`min_num` as `min_num`,
+          v1.`desc` as `desc`, v2.`pic` as `pic`, v2.`title` as `title`,
+          v2.`info` as `info`, v2.`facility` as `facility`, v2.`capacity` as `capacity`
+        from
+          `vehicle_package` v1 left join `vehicle` v2 on v1.`vehicle_id` = v2.`id`
+        where
+        v1.`id` in (
+          select `veichle_package_id`
+          from `product_vehicle_package`
+          where `status`=1 and `product_id`=#{productId}
+        )
+        order by v1.`id`
+    </select>
+
+</mapper>
