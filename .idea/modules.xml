@@ -6,8 +6,10 @@
       <module fileurl="file://$PROJECT_DIR$/op-service.iml" filepath="$PROJECT_DIR$/op-service.iml" />
       <module fileurl="file://$PROJECT_DIR$/../op-web/op-web.iml" filepath="$PROJECT_DIR$/../op-web/op-web.iml" />
       <module fileurl="file://$PROJECT_DIR$/../parent/parent.iml" filepath="$PROJECT_DIR$/../parent/parent.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../price-service/price-service.iml" filepath="$PROJECT_DIR$/../price-service/price-service.iml" />
       <module fileurl="file://$PROJECT_DIR$/../user-service/user-service.iml" filepath="$PROJECT_DIR$/../user-service/user-service.iml" />
       <module fileurl="file://$PROJECT_DIR$/../user-web/user-web.iml" filepath="$PROJECT_DIR$/../user-web/user-web.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../web-common/web-common.iml" filepath="$PROJECT_DIR$/../web-common/web-common.iml" />
     </modules>
   </component>
 </project>

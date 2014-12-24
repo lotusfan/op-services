@@ -32,6 +32,7 @@
 			<if test="pathId != null"> `path_id` = #{pathId},</if>
             <if test="vehiclePackageId != null"> `vehicle_package_id` = #{vehiclePackageId},</if>
 			<if test="serviceId != null"> `service_id` = #{serviceId},</if>
+            <if test="servicePackageId != null"> `service_package_id` = #{servicePackageId},</if>
             <if test="supplierId != null"> `supplier_id` = #{supplierId},</if>
             <if test="count != null"> `count` = #{count},</if>
             <if test="unitPrice != null"> `unit_price` = #{unitPrice},</if>
@@ -39,6 +40,10 @@
             <if test="payAmount != null"> `pay_amount` = #{payAmount},</if>
 			<if test="createTime != null"> create_time = #{createTime},</if>
 			<if test="modifyTime != null"> modify_time = #{modifyTime},</if>
+            <if test="useTime != null"> use_time = #{useTime},</if>
+            <if test="changePriceFlag != null"> change_price_flag = #{changePriceFlag},</if>
+            <if test="status != null"> status = #{status},</if>
+            <if test="remarks != null"> remarks = #{remarks},</if>
 		</trim>
 		where id = #{id}
 	</update>

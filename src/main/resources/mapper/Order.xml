@@ -32,12 +32,12 @@
 	<update id="update" parameterType="com.yellowcar.entities.Order">
 		update `order`
 		<trim prefix="set" suffixOverrides=",">
-			<if test="code != null"> `code` = #{code},</if>
-            <if test="userId != null"> `userId` = #{user_id},</if>
+            <if test="userId != null"> `user_id` = #{userId},</if>
             <if test="phone!= null"> `phone` = #{phone},</if>
             <if test="productId!= null"> `product_id` = #{productId},</if>
+            <if test="productTitle!= null"> `product_title` = #{productTitle},</if>
             <if test="dayNum!= null"> `day_num` = #{dayNum},</if>
-            <if test="personNum!= null"> `person_num`=#{personNum} </if>
+            <if test="personNum!= null"> `person_num`=#{personNum}, </if>
             <if test="childNum!= null"> `child_num` = #{childNum},</if>
             <if test="amount!= null"> `amount` = #{amount},</if>
             <if test="payAmount!= null"> `pay_amount` = #{payAmount},</if>
@@ -48,9 +48,11 @@
             <if test="payTime != null"> `pay_time` = #{payTime},</if>
             <if test="settleTime != null"> `settle_time` = #{settleTime},</if>
             <if test="createTime != null"> `create_time` = #{createTime},</if>
-			<if test="modifyTime != null"> `modify_time` = #{modifyTime},</if>
+            <if test="status!= null"> `status` = #{status},</if>
+            <if test="tripBegin!= null"> `trip_begin` = #{tripBegin},</if>
+            <if test="tripEnd!= null"> `trip_end` = #{tripEnd},</if>
 		</trim>
-		where id = #{id}
+		where code = #{code}
 	</update>
 
 

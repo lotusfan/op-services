@@ -25,16 +25,20 @@
         <module name="common" />
         <module name="op-service" />
         <module name="op-web" />
+        <module name="price-service" />
         <module name="user-service" />
         <module name="user-web" />
+        <module name="web-common" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="common" target="1.8" />
       <module name="op-service" target="1.8" />
       <module name="op-web" target="1.8" />
+      <module name="price-service" target="1.8" />
       <module name="user-service" target="1.8" />
       <module name="user-web" target="1.8" />
+      <module name="web-common" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>

@@ -3,11 +3,11 @@
  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.opservice.dao.VehiclePriceCalendarMapper">
+<mapper namespace="com.yellowcar.price.dao.ServicePriceCalendarMapper">
 
-	<resultMap type="com.yellowcar.entities.VehiclePriceCalendar" id="vehiclePriceResultMap">
+	<resultMap type="com.yellowcar.entities.ServicePriceCalendar" id="servicePriceResultMap">
 		<id column="id" property="id" />
-		<result column="vehicle_package_id" property="vehiclePackageId" />
+		<result column="service_id" property="serviceId" />
 		<result column="price" property="price" />
         <result column="year" property="year" />
 		<result column="month" property="month" />
@@ -19,11 +19,11 @@
 
 
     <!--    保存    -->
-	<insert id="save" parameterType="com.yellowcar.entities.VehiclePriceCalendar"
+	<insert id="save" parameterType="com.yellowcar.entities.ServicePriceCalendar"
 		useGeneratedKeys="true" keyProperty="id">
-		insert into `vehicle_price_calendar`(
+		insert into `service_price_calendar`(
 		<trim suffixOverrides=",">
-			<if test="vehiclePackageId != null"> `vehicle_package_id` ,</if>
+			<if test="serviceId != null"> `service_id` ,</if>
 			<if test="price != null"> `price` ,</if>
             <if test="year != null"> `year` ,</if>
 			<if test="month != null"> `month` ,</if>
@@ -34,7 +34,7 @@
 		</trim>
 		)values(
 		<trim suffixOverrides=",">
-			<if test="vehiclePackageId != null"> #{vehiclePackageId} ,</if>
+			<if test="serviceId != null"> #{serviceId} ,</if>
 			<if test="price != null"> #{price} ,</if>
             <if test="year != null"> #{year} ,</if>
 			<if test="month != null"> #{month} ,</if>
@@ -50,10 +50,10 @@
 	</insert>
 
 
-    <update id="update" parameterType="com.yellowcar.entities.VehiclePriceCalendar">
-        update `vehicle_price_calendar`
+    <update id="update" parameterType="com.yellowcar.entities.ServicePriceCalendar">
+        update `service_price_calendar`
         <trim prefix="set" suffixOverrides=",">
-            <if test="vehiclePackageId != null"> `vehicle_package_id` = #{vehiclePackageId},</if>
+            <if test="serviceId != null"> `service_id` = #{serviceId},</if>
             <if test="price != null"> `price` = #{price},</if>
             <if test="year != null"> `year` = #{year},</if>
             <if test="month != null"> `month` = #{month},</if>
@@ -64,17 +64,18 @@
         where id = #{id}
     </update>
 
-    <select id="getById" parameterType="java.lang.Long" resultMap="vehiclePriceResultMap">
+    <select id="getById" parameterType="java.lang.Long" resultMap="servicePriceResultMap">
         select *
-        from `vehicle_price_calendar`
+        from `service_price_calendar`
         where `id` = #{id}
     </select>
 
-    <select id="getBy" parameterType="com.yellowcar.entities.VehiclePriceCalendar" resultMap="vehiclePriceResultMap">
+    <select id="getSPPCBy" parameterType="com.yellowcar.entities.ServicePriceCalendar" resultMap="servicePriceResultMap">
         select *
-        from `vehicle_price_calendar`
+        from `service_price_calendar`
         where 1=1
-        <if test="vehiclePackageId != null"> and `vehicle_package_id` = #{vehiclePackageId} </if>
+        <if test="id != null"> and `id` = #{id} </if>
+        <if test="serviceId != null"> and `service_id` = #{serviceId} </if>
         <if test="year != null"> and `year` = #{year} </if>
         <if test="month != null"> and `month` = #{month} </if>
         <if test="day != null"> and `day` = #{day} </if>

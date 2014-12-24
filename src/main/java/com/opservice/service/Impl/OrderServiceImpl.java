@@ -91,4 +91,21 @@ public class OrderServiceImpl implements OrderServiceIn {
     public void insertOrderSubsidiary(OrderSubsidiary orderSubsidiary) {
         orderSubsidiaryMapper.insertOrderSubsidiary(orderSubsidiary);
     }
+
+    @Override
+    public void updateOSById(OrderSubsidiary orderSubsidiary) {
+        orderSubsidiaryMapper.updateOSById(orderSubsidiary);
+    }
+
+    @Override
+    public void updateOById(Order order) {
+        orderMapper.update(order);
+    }
+
+    @Override
+    public void updateOPById(List<OrderProductDetail> list) {
+        for (OrderProductDetail orderProductDetail : list) {
+            orderProductDetailMapper.update(orderProductDetail);
+        }
+    }
 }

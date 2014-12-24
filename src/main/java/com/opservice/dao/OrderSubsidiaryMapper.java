@@ -9,4 +9,6 @@ public interface OrderSubsidiaryMapper {
     public OrderSubsidiary getOrderSubsidiary(String order_code);
 
     public void insertOrderSubsidiary(OrderSubsidiary orderSubsidiary);
+
+    public void updateOSById(OrderSubsidiary orderSubsidiary);
 }

@@ -3,12 +3,16 @@ package com.opservice.service.Impl;
 import com.opservice.dao.VehicleMapper;
 import com.opservice.dao.VehiclePackageMapper;
 import com.opservice.dao.VehiclePriceCalendarMapper;
+import com.opservice.dao.VehicleSPCalendarMapper;
 import com.opservice.service.VehicleServiceIn;
 import com.yellowcar.entities.Vehicle;
 import com.yellowcar.entities.VehiclePackage;
 import com.yellowcar.entities.VehiclePriceCalendar;
+import com.yellowcar.entities.VehicleSupplierPriceCalendar;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * Created by zhangfan on 2014/12/11.
@@ -22,6 +26,8 @@ public class VehicleServiceImpl implements VehicleServiceIn {
     private VehiclePackageMapper vehiclePackageMapper;
     @Autowired
     private VehiclePriceCalendarMapper vehiclePriceCalendarMapper;
+    @Autowired
+    private VehicleSPCalendarMapper vehicleSPCalendarMapper;
 
     @Override
     public Vehicle getVehicle(long vehicleId) {
@@ -41,5 +47,15 @@ public class VehicleServiceImpl implements VehicleServiceIn {
         vehiclePriceCalendar.setMonth(month);
         vehiclePriceCalendar.setDay(day);
         return vehiclePriceCalendarMapper.getBy(vehiclePriceCalendar).get(0);
+    }
+
+    @Override
+    public List<VehicleSupplierPriceCalendar> getVehicleSPCBy(VehicleSupplierPriceCalendar vspc) {
+        return vehicleSPCalendarMapper.getVehilceSPCBy(vspc);
+    }
+
+    @Override
+    public List<VehiclePriceCalendar> getVPCBy(VehiclePriceCalendar vpc) {
+        return vehiclePriceCalendarMapper.getBy(vpc);
     }
 }

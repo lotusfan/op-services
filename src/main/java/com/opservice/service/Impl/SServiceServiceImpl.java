@@ -1,12 +1,14 @@
 package com.opservice.service.Impl;
 
 import com.opservice.dao.ServiceClauseMapper;
-import com.opservice.dao.ServicePPCalendarMapper;
+import com.opservice.dao.ServicePackagePriceCalendarMapper;
+import com.opservice.dao.ServicePackageSupplierPriceCalendarMapper;
 import com.opservice.dao.ServicePackageMapper;
 import com.opservice.service.SServiceServiceIn;
 import com.yellowcar.entities.ServiceClause;
 import com.yellowcar.entities.ServicePackage;
 import com.yellowcar.entities.ServicePackagePriceCalendar;
+import com.yellowcar.entities.ServicePackageSPriceCalendar;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,13 +21,16 @@ import java.util.List;
 public class SServiceServiceImpl implements SServiceServiceIn {
 
     @Autowired
-    private ServicePPCalendarMapper servicePPCalendarMapper;
+    private ServicePackagePriceCalendarMapper servicePackagePriceCalendarMapper;
 
     @Autowired
     private ServicePackageMapper servicePackageMapper;
 
     @Autowired
     private ServiceClauseMapper serviceClauseMapper;
+
+    @Autowired
+    private ServicePackageSupplierPriceCalendarMapper servicePackageSupplierPriceCalendarMapper;
 
     @Override
     public ServicePackagePriceCalendar getServicePPCalendarBy(long servicePackageId, int year, int month, int day) {
@@ -34,12 +39,12 @@ public class SServiceServiceImpl implements SServiceServiceIn {
         sppc.setYear(year);
         sppc.setMonth(month);
         sppc.setDay(day);
-        return servicePPCalendarMapper.getServicePPCalendarBy(sppc).get(0);
+        return servicePackagePriceCalendarMapper.getSPPCBy(sppc).get(0);
         // return getSPPCById(servicePackageId);
     }
     @Override
     public ServicePackagePriceCalendar getSPPCById(long servicePackageId) {
-        return servicePPCalendarMapper.getSPPCById(servicePackageId);
+        return servicePackagePriceCalendarMapper.getSPPCById(servicePackageId);
     }
 
     @Override
@@ -55,5 +60,15 @@ public class SServiceServiceImpl implements SServiceServiceIn {
     @Override
     public List<ServicePackage> getSPByServiceId(long serviceId) {
         return servicePackageMapper.getSPByServiceId(serviceId);
+    }
+
+    @Override
+    public List<ServicePackageSPriceCalendar> getSPSPCBy(ServicePackageSPriceCalendar spspc) {
+        return servicePackageSupplierPriceCalendarMapper.getServicePSPCBy(spspc);
+    }
+
+    @Override
+    public List<ServicePackagePriceCalendar> getSPPCBy(ServicePackagePriceCalendar sppc) {
+        return servicePackagePriceCalendarMapper.getSPPCBy(sppc);
     }
 }

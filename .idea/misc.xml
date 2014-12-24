@@ -6,6 +6,7 @@
   <component name="FrameworkDetectionExcludesConfiguration">
     <file type="web" url="file://$PROJECT_DIR$" />
     <file type="web" url="file://$PROJECT_DIR$/../op-web" />
+    <file type="web" url="file://$PROJECT_DIR$/../price-service" />
     <file type="web" url="file://$PROJECT_DIR$/../user-service" />
     <file type="web" url="file://$PROJECT_DIR$/../user-web" />
   </component>
@@ -19,6 +20,8 @@
         <option value="$PROJECT_DIR$/../user-service/pom.xml" />
         <option value="$PROJECT_DIR$/../op-web/pom.xml" />
         <option value="$PROJECT_DIR$/../user-web/pom.xml" />
+        <option value="$PROJECT_DIR$/../price-service/pom.xml" />
+        <option value="$PROJECT_DIR$/../web-common/pom.xml" />
       </list>
     </option>
   </component>

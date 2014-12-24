@@ -3,9 +3,9 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.opservice.dao.ServicePackagePriceCalendarMapper">
+<mapper namespace="com.opservice.dao.ServicePackageSupplierPriceCalendarMapper">
 
-    <resultMap type="com.yellowcar.entities.ServicePackagePriceCalendar" id="servicePPCalendarResultMap">
+    <resultMap type="com.yellowcar.entities.ServicePackageSPriceCalendar" id="servicePSPCalendarResultMap">
         <id column="id" property="id"/>
         <result column="service_package_id" property="servicePackageId"/>
         <result column="price" property="price"/>
@@ -13,22 +13,18 @@
         <result column="month" property="month"/>
         <result column="day" property="day"/>
         <result column="today_time" property="todayTime"/>
+        <result column="money_type" property="moneyType"/>
+        <result column="supplier_id" property="supplierId"/>
 
         <result column="create_time" property="createTime"/>
         <result column="modify_time" property="modifyTime"/>
-
     </resultMap>
 
 
-    <select id="getSPPCById" parameterType="java.lang.Long" resultMap="servicePPCalendarResultMap">
+    <select id="getServicePSPCBy" parameterType="com.yellowcar.entities.ServicePackageSPriceCalendar"
+            resultMap="servicePSPCalendarResultMap">
         select *
-        from `service_package_price_calendar`
-        where service_package_id= #{servicePackageId}
-    </select>
-    <select id="getSPPCBy" parameterType="com.yellowcar.entities.ServicePackagePriceCalendar"
-            resultMap="servicePPCalendarResultMap">
-        select *
-        from service_package_price_calendar
+        from `service_package_supplier_price_calendar`
         <!--
         where sppc.service_package_id = #{servicePackageId} and sppc.year = #{year} and sppc.month = #{month} and sppc.day = #{day}
 -->
@@ -49,6 +45,9 @@
             </if>
             <if test="day != null">
                 and `day` = #{day}
+            </if>
+            <if test="supplierId != null">
+                and `supplier_id` = #{supplierId}
             </if>
 
         </trim>

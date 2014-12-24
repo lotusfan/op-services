@@ -31,5 +31,10 @@ public interface OrderServiceIn {
 
     public void insertOrderSubsidiary(OrderSubsidiary orderSubsidiary);
 
+    public void updateOSById(OrderSubsidiary orderSubsidiary);
+
+    public void updateOById(Order order);
+
+    public void updateOPById(List<OrderProductDetail> list);
 
 }

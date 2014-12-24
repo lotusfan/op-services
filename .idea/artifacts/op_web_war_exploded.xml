@@ -44,7 +44,9 @@
           <element id="library" level="project" name="Maven: org.mybatis:mybatis-spring:1.2.2" />
           <element id="library" level="project" name="Maven: mysql:mysql-connector-java:5.1.33" />
           <element id="library" level="project" name="Maven: com.fasterxml.jackson.core:jackson-annotations:2.1.0" />
-          <element id="library" level="project" name="Maven: com.yellowcar:web-common:1.0-SNAPSHOT" />
+          <element id="archive" name="web-common-1.0-SNAPSHOT.jar">
+            <element id="module-output" name="web-common" />
+          </element>
           <element id="library" level="project" name="Maven: jstl:jstl:1.2" />
           <element id="library" level="project" name="Maven: taglibs:standard:1.1.2" />
         </element>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.opservice.dao.VehicleSPCalendarMapper">
+
+	<resultMap type="com.yellowcar.entities.VehicleSupplierPriceCalendar" id="vehicleSupplierPriceResultMap">
+		<id column="id" property="id" />
+		<result column="vehicle_package_id" property="vehiclePackageId" />
+        <result column="supplier_id" property="supplierId"/>
+		<result column="price" property="price" />
+        <result column="year" property="year" />
+		<result column="month" property="month" />
+        <result column="day" property="day" />
+		<result column="money_type" property="moneyType" />
+        <result column="create_time" property="createTime" />
+		<result column="modify_time" property="modifyTime" />
+	</resultMap>
+
+    <select id="getVehilceSPCBy" parameterType="com.yellowcar.entities.VehicleSupplierPriceCalendar" resultMap="vehicleSupplierPriceResultMap">
+        select *
+        from `vehicle_supplier_price_calendar`
+        where
+        <if test="vehiclePackageId != null"> `vehicle_package_id` = #{vehiclePackageId} </if>
+        <if test="year != null"> and `year` = #{year} </if>
+        <if test="month != null"> and `month` = #{month} </if>
+        <if test="day != null"> and `day` = #{day} </if>
+        <if test="supplierId != null"> and `supplier_id` = #{supplierId} </if>
+    </select>
+</mapper>
