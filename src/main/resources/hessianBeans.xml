@@ -9,6 +9,7 @@
             <map>
                 <entry key="/orderViewService" value-ref="orderViewService" />
                 <entry key="/orderOptionService" value-ref="orderOptionalService"/>
+                <entry key="/orderPrice" value-ref="orderPrice"/>
             </map>
         </property>
     </bean>
@@ -21,10 +22,15 @@
         <property name="service" ref="hessianOrderOptionalService"/>
         <property name="serviceInterface" value="com.yellowcar.api.op.OrderOptionalServiceIn"/>
     </bean>
+    <bean id="orderPrice" class="org.springframework.remoting.caucho.HessianServiceExporter">
+        <property name="service" ref="hessianOrderPrice"/>
+        <property name="serviceInterface" value="com.yellowcar.api.op.OrderPriceIn"/>
+    </bean>
 
     <bean id="bigDecimalSerializerFactory" class="com.yellowcar.utils.SerializerFactory"/>
 
     <bean id="hessianOrderViewService" class="com.opservice.service.Impl.OrderViewServiceImpl" />
     <bean id="hessianOrderOptionalService" class="com.opservice.service.Impl.OrderOptionalServiceImpl"/>
+    <bean id="hessianOrderPrice" class="com.opservice.service.Impl.OrderPriceImpl"/>
 
 </beans>

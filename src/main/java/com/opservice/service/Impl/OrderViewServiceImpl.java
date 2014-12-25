@@ -69,16 +69,18 @@ public class OrderViewServiceImpl extends OrderServiceParent implements OrderVie
         orderDetailView.setRemarksPlace(orderSubsidiary.getRemarksPlace());
 
         JSONArray jsonArray = JSONArray.parseArray(orderSubsidiary.getRemarksPlace());
-        List<ReceivePlace> listrp = new ArrayList<>();
-        for (int i = 0; i < jsonArray.size(); i++) {
-            ReceivePlace receivePlace = new ReceivePlace();
-            JSONObject jsonObject = jsonArray.getJSONObject(i);
-            receivePlace.setDestination(jsonObject.getString("destination"));
-            receivePlace.setDeaddress(jsonObject.getString("deaddress"));
-            receivePlace.setGtime(jsonObject.getString("gtime"));
-            listrp.add(receivePlace);
+        if (jsonArray != null && jsonArray.size() != 0) {
+            List<ReceivePlace> listrp = new ArrayList<>();
+            for (int i = 0; i < jsonArray.size(); i++) {
+                ReceivePlace receivePlace = new ReceivePlace();
+                JSONObject jsonObject = jsonArray.getJSONObject(i);
+                receivePlace.setDestination(jsonObject.getString("destination"));
+                receivePlace.setDeaddress(jsonObject.getString("deaddress"));
+                receivePlace.setGtime(jsonObject.getString("gtime"));
+                listrp.add(receivePlace);
+            }
+            orderDetailView.setListrp(listrp);
         }
-        orderDetailView.setListrp(listrp);
 
 
         //Order Details 多表
@@ -115,7 +117,8 @@ public class OrderViewServiceImpl extends OrderServiceParent implements OrderVie
                     orderDetailView.setPrimePrice(listvspc.get(0).getPrice() + "");
                     orderDetailView.setMoneyType(listvspc.get(0).getMoneyType() + "");
                 }
-                //价格调整未录入
+                //价格调整
+
             } else {
                 //Services 多表
                 generateOrderServiceViewList(list, orderProductDetail, orderSubsidiary.getSourceOrderTime());
@@ -272,6 +275,8 @@ public class OrderViewServiceImpl extends OrderServiceParent implements OrderVie
             orderSubsidiary.setRemarksPlace(orderDetailView.getRemarksPlace());//地点json
             orderSubsidiary.setRemind(orderDetailView.getRemind());
             orderSubsidiary.setSourceOrderTime(new Timestamp(sdf.parse(orderDetailView.getSourceOrderTime()).getTime()));
+            orderSubsidiary.setTask(orderDetailView.getTask());
+            orderSubsidiary.setOrderPics(orderDetailView.getOrderPics());
 
             //order_detail表 车信息
             OrderProductDetail orderProductDetail = new OrderProductDetail();
@@ -301,7 +306,7 @@ public class OrderViewServiceImpl extends OrderServiceParent implements OrderVie
                 orderPDetail.setServicePackageId(Long.parseLong(orderServiceView.getServicePackageId()));
                 orderPDetail.setServiceId(Long.parseLong(orderServiceView.getServiceId()));
                 orderPDetail.setRemarks(orderServiceView.getRemarks());
-                orderPDetail.setStatus(ORDERSTATUS_CREATE);//订单状态  （创建）
+                orderPDetail.setStatus(Integer.parseInt(orderServiceView.getStatus()));//订单状态  （创建）
                 orderPDetail.setUseTime(new Timestamp(sdf.parse(orderServiceView.getUseTime()).getTime()));
                 opdlist.add(orderPDetail);
             }

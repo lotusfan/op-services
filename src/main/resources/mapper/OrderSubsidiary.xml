@@ -27,7 +27,9 @@
         <result column="remind" property="remind" />
         <result column="image_num" property="imageNum" />
         <result column="source_order_time" property="sourceOrderTime" />
-	</resultMap>
+        <result column="order_pics" property="orderPics" />
+
+    </resultMap>
 
 
     <select id="getOrderSubsidiary" parameterType="java.lang.String" resultMap="orderSubsidiaryResultMap">
@@ -55,6 +57,8 @@
             <if test="remind != null"> `remind` ,</if>
             <if test="imageNum != null"> `image_num` ,</if>
             <if test="sourceOrderTime != null"> `source_order_time` ,</if>
+            <if test="orderPics != null">`order_pics`,</if>
+
         </trim>
         )values(
         <trim prefixOverrides="," suffixOverrides=",">
@@ -73,6 +77,7 @@
             <if test="remind != null"> #{remind} ,</if>
             <if test="imageNum != null"> #{imageNum} ,</if>
             <if test="sourceOrderTime != null"> #{sourceOrderTime} ,</if>
+            <if test="orderPics != null">#{orderPics} ,</if>
         </trim>
         )
     </insert>
@@ -95,7 +100,8 @@
             <if test="remind != null">`remind`= #{remind} ,</if>
             <if test="imageNum != null">`image_num`= #{imageNum} ,</if>
             <if test="sourceOrderTime != null">`source_order_time`= #{sourceOrderTime} ,</if>
-		</trim>
+            <if test="orderPics != null">`order_pics`= #{orderPics} ,</if>
+        </trim>
 		where order_code = #{orderCode}
 	</update>
 

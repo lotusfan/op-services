@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.opservice.dao.OrderItemMapper">
+
+	<resultMap type="com.yellowcar.entities.OrderItem" id="orderItemResultMap">
+		<id column="id" property="id" />
+		<result column="order_code" property="orderCode" />
+        <result column="vehicle_package_id" property="vehiclePackageId" />
+        <result column="service_id" property="serviceId" />
+        <result column="amount" property="amount" />
+        <result column="source_type" property="sourceType"/>
+        <result column="source_id" property="sourceId" />
+        <result column="source_desc" property="sourceDesc" />
+        <result column="charge" property="charge" />
+        <result column="third_part_id" property="thirdPartId" />
+        <result column="third_part_desc" property="thirdPartDesc" />
+        <result column="service_package_id" property="servicePackageId" />
+		<result column="create_time" property="createTime" />
+		<result column="modify_time" property="modifyTime" />
+	</resultMap>
+
+	<update id="update" parameterType="com.yellowcar.entities.OrderItem">
+		update `order`
+		<trim prefix="set" suffixOverrides=",">
+            <if test="orderCode != null"> `order_code` = #{orderCode},</if>
+            <if test="vehiclePackageId!= null"> `vehicle_package_id` = #{vehiclePackageId},</if>
+            <if test="amount!= null"> `amount` = #{amount},</if>
+            <if test="sourceType!= null"> `source_type` = #{sourceType},</if>
+            <if test="sourceId!= null"> `service_id` = #{sourceId},</if>
+            <if test="sourceDesc!= null"> `source_desc`=#{sourceDesc}, </if>
+            <if test="charge!= null"> `charge` = #{charge},</if>
+            <if test="thirdPartId!= null"> `third_part_id` = #{thirdPartId},</if>
+            <if test="thirdPartDesc!= null"> `third_part_desc` = #{thirdPartDesc},</if>
+            <if test="servicePackageId!= null"> `service_package_id` = #{servicePackageId},</if>
+            <if test="modifyTime != null"> `modify_time` = #{modifyTime},</if>
+            <if test="createTime != null"> `create_time` = #{createTime},</if>
+		</trim>
+		where source_id = #{sourceId}
+	</update>
+
+
+	<insert id="save" parameterType="com.yellowcar.entities.OrderItem"
+		useGeneratedKeys="true" keyProperty="id">
+		insert into `order`(
+		<trim prefixOverrides="," suffixOverrides=",">
+            <if test="orderCode != null"> `order_code`,</if>
+            <if test="vehiclePackageId!= null"> `vehicle_package_id`,</if>
+            <if test="amount!= null"> `amount`,</if>
+            <if test="sourceType!= null"> `source_type`,</if>
+            <if test="sourceId!= null"> `service_id`,</if>
+            <if test="sourceDesc!= null"> `source_desc`, </if>
+            <if test="charge!= null"> `charge`,</if>
+            <if test="thirdPartId!= null"> `third_part_id`,</if>
+            <if test="thirdPartDesc!= null"> `third_part_desc`,</if>
+            <if test="servicePackageId!= null"> `service_package_id`,</if>
+            <if test="modifyTime != null"> `modify_time`,</if>
+            <if test="createTime != null"> `create_time`,</if>
+		</trim>
+		)values(
+		<trim prefixOverrides="," suffixOverrides=",">
+            <if test="orderCode != null"> #{orderCode},</if>
+            <if test="vehiclePackageId!= null"> #{vehiclePackageId},</if>
+            <if test="amount!= null"> #{amount},</if>
+            <if test="sourceType!= null"> #{sourceType},</if>
+            <if test="sourceId!= null"> #{sourceId},</if>
+            <if test="sourceDesc!= null"> #{sourceDesc}, </if>
+            <if test="charge!= null"> #{charge},</if>
+            <if test="thirdPartId!= null"> #{thirdPartId},</if>
+            <if test="thirdPartDesc!= null"> #{thirdPartDesc},</if>
+            <if test="servicePackageId!= null"> #{servicePackageId},</if>
+            <if test="modifyTime != null"> #{modifyTime},</if>
+            <if test="createTime != null"> #{createTime},</if>
+		</trim>
+		)
+	</insert>
+
+
+    <select id="getBy" parameterType="com.yellowcar.entities.OrderItem" resultMap="orderItemResultMap">
+        select *
+        from `order`
+        <trim prefix="where" prefixOverrides="AND|OR">
+            <if test="code != null and code != '' ">
+                AND `source_id` = #{sourceId}
+            </if>
+        </trim>
+    </select>
+</mapper>

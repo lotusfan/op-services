@@ -3,10 +3,7 @@ package com.opservice.service.Impl;
 import com.opservice.service.SServiceServiceIn;
 import com.opservice.service.VehicleServiceIn;
 import com.yellowcar.api.op.OrderPriceIn;
-import com.yellowcar.entities.ServicePackagePriceCalendar;
-import com.yellowcar.entities.ServicePackageSPriceCalendar;
-import com.yellowcar.entities.VehiclePriceCalendar;
-import com.yellowcar.entities.VehicleSupplierPriceCalendar;
+import com.yellowcar.entities.*;
 import net.sf.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,6 +29,7 @@ public class OrderPriceImpl implements OrderPriceIn {
     private String PRIMEPRICE = "primePrice";
     private String SELLPRICE = "sellPrice";
     private String MONEYTYPE = "moneyType";
+    private String UNIT = "unit";
 
 
     @Override
@@ -59,6 +57,9 @@ public class OrderPriceImpl implements OrderPriceIn {
             vpc.setDay(calendar.get(Calendar.DAY_OF_MONTH));
             List<VehiclePriceCalendar> listvpcs = vehicleServiceIn.getVPCBy(vpc);
             jsonObject.put(SELLPRICE, listvpcs.get(0).getPrice());
+
+            VehiclePackage vp = vehicleServiceIn.getVehiclePackage(Long.parseLong(vehiclePackageId));
+            jsonObject.put(UNIT, vp.getUnit());
             return jsonObject.toString();
         } catch (Exception e) {
             e.printStackTrace();
@@ -93,6 +94,8 @@ public class OrderPriceImpl implements OrderPriceIn {
             List<ServicePackagePriceCalendar> listsppcs = sServiceServiceIn.getSPPCBy(sppc);
             jsonObject.put(SELLPRICE, listsppcs.get(0).getPrice());
 
+            ServicePackage sp = sServiceServiceIn.getServicePackageById(Long.parseLong(servicePackageId));
+            jsonObject.put(UNIT, sp.getUnit());
             return jsonObject.toString();
         } catch (Exception e) {
             e.printStackTrace();
