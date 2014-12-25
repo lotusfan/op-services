@@ -250,7 +250,7 @@ public class OrderViewServiceImpl extends OrderServiceParent implements OrderVie
             order.setUserId(Long.parseLong(orderDetailView.getUserId()));
             order.setDayNum(Integer.parseInt(orderDetailView.getDayNum()));
 
-            order.setTripDate(new Timestamp(sdf.parse(orderDetailView.getTripDate()).getTime()));
+            order.setTripDate(orderDetailView.getTripDate());
             order.setAmount(new BigDecimal(orderDetailView.getAmount()));//订单总金额
             order.setPayAmount(new BigDecimal("0.22"));//支付总金额
             order.setTripBegin(orderDetailView.getTripBegin());
