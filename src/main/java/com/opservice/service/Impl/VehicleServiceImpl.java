@@ -46,7 +46,8 @@ public class VehicleServiceImpl implements VehicleServiceIn {
         vehiclePriceCalendar.setYear(year);
         vehiclePriceCalendar.setMonth(month);
         vehiclePriceCalendar.setDay(day);
-        return vehiclePriceCalendarMapper.getBy(vehiclePriceCalendar).get(0);
+        List<VehiclePriceCalendar> list = vehiclePriceCalendarMapper.getBy(vehiclePriceCalendar);
+        return (list != null && list.size()>0) ? list.get(0):null;
     }
 
     @Override

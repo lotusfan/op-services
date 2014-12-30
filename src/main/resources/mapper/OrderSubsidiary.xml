@@ -18,7 +18,6 @@
         <result column="create_time" property="createTime" />
         <result column="modify_time" property="modifyTime" />
 
-
         <result column="car_type" property="carType" />
         <result column="flight_num" property="flightNum" />
         <result column="flight_time" property="flightTime" />

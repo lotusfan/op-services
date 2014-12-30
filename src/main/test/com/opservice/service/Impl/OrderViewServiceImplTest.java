@@ -7,11 +7,8 @@ import com.yellowcar.api.op.OrderListBy;
 import com.yellowcar.api.op.OrderPriceIn;
 import com.yellowcar.api.op.OrderViewServiceIn;
 import com.opservice.service.SServiceServiceIn;
-import com.yellowcar.entities.ServicePackageSPriceCalendar;
-import com.yellowcar.entities.VehicleSupplierPriceCalendar;
+import com.yellowcar.entities.*;
 import com.yellowcar.view.OrderGeneralView;
-import com.yellowcar.entities.Order;
-import com.yellowcar.entities.OrderProductDetail;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,8 +36,10 @@ public class OrderViewServiceImplTest {
     private SServiceServiceIn sServiceServiceIn;
     @Autowired
     private VehicleServiceIn vehicleServiceIn;
+/*
     @Autowired
     private OrderPriceIn orderPriceIn;
+*/
 
 
 
@@ -197,13 +196,40 @@ public class OrderViewServiceImplTest {
     }
 
 
-    public void testGetVehiclePrice() {
+ /*   public void testGetVehiclePrice() {
         System.out.println(orderPriceIn.getVehiclePrice(1+"",1+"","2014-12-16"));
     }
 
-    @Test
+
     public void testGetServicePackagePrice() {
         System.out.println(orderPriceIn.getServicePackagePrice(1+"", 1+"", "2014-12-22"));
     }
+*/
+
+    public void testGetOrderItemBy() {
+        OrderItem orderItem = new OrderItem();
+        orderItem.setSourceId(123456789L);
+        System.out.println(orderServiceIn.getOrderItemBy(orderItem));
+    }
+
+
+    public void testGetOrderPrimeItemBy() {
+        OrderPrimeItem orderPrimeItem = new OrderPrimeItem();
+        orderPrimeItem.setSourceId(123456789L);
+        System.out.println(orderServiceIn.getOrderPrimeItemBy(orderPrimeItem));
+    }
+
+    @Test
+    public void testInsertOrderItem() {
+        OrderPrimeItem orderPrimeItem = new OrderPrimeItem();
+        orderPrimeItem.setSourceId(1234567539L);
+        System.out.println(orderServiceIn.insertOrUpdateOrderPrimeItem(orderPrimeItem));
+        System.out.println(orderPrimeItem.getId());
+    }
+
+    public void testInsertOrderPrimeItem() {
+
+    }
+
 
 }

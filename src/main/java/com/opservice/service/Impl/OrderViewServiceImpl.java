@@ -9,7 +9,7 @@ import com.yellowcar.entities.*;
 import com.yellowcar.view.OrderDetailView;
 import com.yellowcar.view.OrderGeneralView;
 import com.yellowcar.view.OrderServiceView;
-import com.yellowcar.view.ReceivePlace;
+import com.yellowcar.view.RemarksPlace;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
@@ -23,7 +23,9 @@ import java.util.List;
 
 public class OrderViewServiceImpl extends OrderServiceParent implements OrderViewServiceIn {
 
-    private int ORDERSTATUS_CREATE = 0;
+    private final int ORDERSTATUS_CREATE = 0;
+    private final String PRIMEPRICEMODIFY = "primePriceModify";
+    private final String SELLPRICEMODIFY = "sellPriceModify";
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     @Override
@@ -42,7 +44,7 @@ public class OrderViewServiceImpl extends OrderServiceParent implements OrderVie
         orderDetailView.setPhone(order.getPhone());
         orderDetailView.setProductId(order.getProductId() + "");
         orderDetailView.setStatus(order.getStatus() + "");
-        orderDetailView.setTripDate(sdf.format(order.getTripDate()));
+        orderDetailView.setTripDate(order.getTripDate());
         orderDetailView.setTripBegin(order.getTripBegin());
         orderDetailView.setProductTitle(order.getProductTitle());
         orderDetailView.setAmount(order.getAmount() + "");
@@ -53,46 +55,60 @@ public class OrderViewServiceImpl extends OrderServiceParent implements OrderVie
 
         //Order附属表
         OrderSubsidiary orderSubsidiary = orderServiceIn.getOrderSubsidiary(orderCode);
+        List<RemarksPlace> listrp = new ArrayList<>();
+        if (orderSubsidiary != null) {
 
-        orderDetailView.setOrderSource(orderSubsidiary.getOrderSource());
-        orderDetailView.setSourceOrderTime(sdf.format(orderSubsidiary.getSourceOrderTime()));
-        orderDetailView.setOutId(orderSubsidiary.getOutId());
-        orderDetailView.setTask(orderSubsidiary.getTask());
-        orderDetailView.setCustomerName(orderSubsidiary.getCustomerName());
-        orderDetailView.setCustomerEmail(orderSubsidiary.getCustomerEmail());
-        orderDetailView.setPhoneLocal(orderSubsidiary.getPhoneLocal());
-        orderDetailView.setCarType(orderSubsidiary.getCarType());
-        orderDetailView.setReceivePlace(orderSubsidiary.getReceivePlace());
-        orderDetailView.setRemind(orderSubsidiary.getRemind());
-        orderDetailView.setFlightNum(orderSubsidiary.getFlightNum());
-        orderDetailView.setFlightTime(sdf.format(orderSubsidiary.getFlightTime()));
-        orderDetailView.setRemarksPlace(orderSubsidiary.getRemarksPlace());
-
-        JSONArray jsonArray = JSONArray.parseArray(orderSubsidiary.getRemarksPlace());
-        if (jsonArray != null && jsonArray.size() != 0) {
-            List<ReceivePlace> listrp = new ArrayList<>();
-            for (int i = 0; i < jsonArray.size(); i++) {
-                ReceivePlace receivePlace = new ReceivePlace();
-                JSONObject jsonObject = jsonArray.getJSONObject(i);
-                receivePlace.setDestination(jsonObject.getString("destination"));
-                receivePlace.setDeaddress(jsonObject.getString("deaddress"));
-                receivePlace.setGtime(jsonObject.getString("gtime"));
-                listrp.add(receivePlace);
+            orderDetailView.setOrderSubsidiaryId(orderSubsidiary.getId() + "");
+            orderDetailView.setOrderSource(orderSubsidiary.getOrderSource());
+            if (orderSubsidiary.getSourceOrderTime() != null) {
+                orderDetailView.setSourceOrderTime(sdf.format(orderSubsidiary.getSourceOrderTime()));
             }
-            orderDetailView.setListrp(listrp);
+            if (orderSubsidiary.getOutId() != null) {
+                orderDetailView.setOutId(orderSubsidiary.getOutId());
+            }
+            orderDetailView.setTask(orderSubsidiary.getTask());
+            orderDetailView.setCustomerName(orderSubsidiary.getCustomerName());
+            orderDetailView.setCustomerEmail(orderSubsidiary.getCustomerEmail());
+            orderDetailView.setPhoneLocal(orderSubsidiary.getPhoneLocal());
+            orderDetailView.setCarType(orderSubsidiary.getCarType());
+            orderDetailView.setReceivePlace(orderSubsidiary.getReceivePlace());
+            orderDetailView.setRemind(orderSubsidiary.getRemind());
+            orderDetailView.setFlightNum(orderSubsidiary.getFlightNum());
+            if ("".equals(orderSubsidiary.getFlightTime())) {
+                orderDetailView.setFlightTime(sdf.format(orderSubsidiary.getFlightTime()));
+            }
+            orderDetailView.setRemarksPlace(orderSubsidiary.getRemarksPlace());
+            orderDetailView.setOrderPics(orderSubsidiary.getOrderPics());
+            JSONArray jsonArray = JSONArray.parseArray(orderSubsidiary.getRemarksPlace());
+            if (jsonArray != null && jsonArray.size() != 0) {
+                for (int i = 0; i < jsonArray.size(); i++) {
+                    RemarksPlace remarksPlace = new RemarksPlace();
+                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+                    remarksPlace.setDestination(jsonObject.getString("destination"));
+                    remarksPlace.setDeaddress(jsonObject.getString("deaddress"));
+                    remarksPlace.setGtime(jsonObject.getString("gtime"));
+                    listrp.add(remarksPlace);
+                }
+            }
         }
-
+        orderDetailView.setListrp(listrp);
 
         //Order Details 多表
         List<OrderProductDetail> opdlist = orderServiceIn.getOrderProductDetailList(orderCode);
         for (OrderProductDetail orderProductDetail : opdlist) {
+            if (orderProductDetail.getVehiclePackageId() == 0 && orderProductDetail.getServiceId() == 0)
+                continue;
             if (orderProductDetail.getVehiclePackageId() != 0 && orderProductDetail.getServicePackageId() == 0) {
                 //用车
+                orderDetailView.setOrderProductDetailId(orderProductDetail.getId() + "");
                 orderDetailView.setVehiclePackageId(orderProductDetail.getVehiclePackageId() + "");
-                orderDetailView.setUseTime(sdf.format(orderProductDetail.getUseTime()));
+                if (orderProductDetail.getUseTime() != null)
+                    orderDetailView.setUseTime(sdf.format(orderProductDetail.getUseTime()));
                 orderDetailView.setSupplierId(orderProductDetail.getSupplierId() + "");
+                orderDetailView.setChangePriceFlag(orderProductDetail.getChangePriceFlag() + "");
                 Supplier supplier = supplierServiceIn.getSupplier(orderProductDetail.getSupplierId());
-                orderDetailView.setSupplierName(supplier.getName());
+                if (supplier != null)
+                    orderDetailView.setSupplierName(supplier.getName());
 
                 orderDetailView.setCarStatus(orderProductDetail.getStatus() + "");
 
@@ -101,30 +117,48 @@ public class OrderViewServiceImpl extends OrderServiceParent implements OrderVie
 
                 Vehicle vehicle = vehicleServiceIn.getVehicle(vehiclePackage.getVehicleId());
                 orderDetailView.setVehicleTitle(vehicle.getTitle());
-                // 销售价
-                Timestamp sourceOrderTime = orderSubsidiary.getSourceOrderTime();
-                VehiclePriceCalendar vehiclePriceCalendar = vehicleServiceIn.getVehiclePriceCalendar(orderProductDetail.getVehiclePackageId(), sourceOrderTime.getYear() + 1900, sourceOrderTime.getMonth() + 1, sourceOrderTime.getDate());
-                if (vehiclePriceCalendar != null) orderDetailView.setSellPrice(vehiclePriceCalendar.getPrice() + "");
-                //成本价
-                VehicleSupplierPriceCalendar vspc = new VehicleSupplierPriceCalendar();
-                vspc.setVehiclePackageId(orderProductDetail.getVehiclePackageId());
-                vspc.setYear(sourceOrderTime.getYear() + 1900);
-                vspc.setMonth(sourceOrderTime.getMonth() + 1);
-                vspc.setDay(sourceOrderTime.getDate());
-                vspc.setSupplierId(orderProductDetail.getSupplierId());
-                List<VehicleSupplierPriceCalendar> listvspc = vehicleServiceIn.getVehicleSPCBy(vspc);
-                if (listvspc != null && listvspc.size() == 1) {
-                    orderDetailView.setPrimePrice(listvspc.get(0).getPrice() + "");
-                    orderDetailView.setMoneyType(listvspc.get(0).getMoneyType() + "");
+
+                Timestamp sourceOrderTime = orderProductDetail.getUseTime();
+                if (sourceOrderTime != null) {
+                    //销售价
+                    VehiclePriceCalendar vehiclePriceCalendar = vehicleServiceIn.getVehiclePriceCalendar(orderProductDetail.getVehiclePackageId(), sourceOrderTime.getYear() + 1900, sourceOrderTime.getMonth() + 1, sourceOrderTime.getDate());
+                    if (vehiclePriceCalendar != null)
+                        orderDetailView.setSellPrice(vehiclePriceCalendar.getPrice() + "");
+                    //成本价
+                    VehicleSupplierPriceCalendar vspc = new VehicleSupplierPriceCalendar();
+                    vspc.setVehiclePackageId(orderProductDetail.getVehiclePackageId());
+                    vspc.setYear(sourceOrderTime.getYear() + 1900);
+                    vspc.setMonth(sourceOrderTime.getMonth() + 1);
+                    vspc.setDay(sourceOrderTime.getDate());
+                    vspc.setSupplierId(orderProductDetail.getSupplierId());
+                    List<VehicleSupplierPriceCalendar> listvspc = vehicleServiceIn.getVehicleSPCBy(vspc);
+                    if (listvspc != null && listvspc.size() == 1) {
+                        orderDetailView.setPrimePrice(listvspc.get(0).getPrice() + "");
+                        orderDetailView.setMoneyType(listvspc.get(0).getMoneyType() + "");
+                    }
                 }
                 //价格调整
+                if (orderProductDetail.getChangePriceFlag() == 1) {
+                    //成本价格调整
+                    OrderItem orderItem = new OrderItem();
+                    orderItem.setSourceId(orderProductDetail.getId());
+                    List<OrderItem> listoi = orderServiceIn.getOrderItemBy(orderItem);
+                    if (listoi != null && listoi.size() == 1)
+                        orderDetailView.setSellPriceModify(listoi.get(0).getAmount() + "");
+                    //销售价格调整
+                    OrderPrimeItem orderPrimeItem = new OrderPrimeItem();
+                    orderPrimeItem.setSourceId(orderProductDetail.getId());
+                    List<OrderPrimeItem> listopi = orderServiceIn.getOrderPrimeItemBy(orderPrimeItem);
+                    if (listopi != null && listopi.size() == 1)
+                        orderDetailView.setPrimePriceModify(listopi.get(0).getAmount() + "");
+                }
+
 
             } else {
                 //Services 多表
-                generateOrderServiceViewList(list, orderProductDetail, orderSubsidiary.getSourceOrderTime());
+                generateOrderServiceViewList(list, orderProductDetail, null);
             }
         }
-        System.out.println(JSONObject.toJSONString(orderDetailView));
         return orderDetailView;
     }
 
@@ -134,40 +168,62 @@ public class OrderViewServiceImpl extends OrderServiceParent implements OrderVie
         orderServiceView.setOrderProductDetailId(orderProductDetail.getId() + "");
         orderServiceView.setSupplierId(orderProductDetail.getSupplierId() + "");
         Supplier supplier = supplierServiceIn.getSupplier(orderProductDetail.getSupplierId());
-        orderServiceView.setSupplierName(supplier.getName());
+        if (supplier != null)
+            orderServiceView.setSupplierName(supplier.getName());
 
         orderServiceView.setStatus(orderProductDetail.getStatus() + "");
         orderServiceView.setServiceId(orderProductDetail.getServiceId() + "");
         orderServiceView.setServicePackageId(orderProductDetail.getServicePackageId() + "");
+
         ServicePackage servicePackage = sServiceServiceIn.getServicePackageById(orderProductDetail.getServicePackageId());
-        orderServiceView.setServicePackageDesc(servicePackage.getServicePackageDesc());
+        if (servicePackage != null) {
+            orderServiceView.setServicePackageDesc(servicePackage.getServicePackageDesc());
+            orderServiceView.setChangePriceFlag(orderProductDetail.getChangePriceFlag() + "");
+        }
 
 
-        Timestamp useTime = orderProductDetail.getUseTime();
-        if (useTime == null) return;
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        SimpleDateFormat simpleDateFormat1 = new SimpleDateFormat("HH:mm:ss");
-        orderServiceView.setUseHms(simpleDateFormat1.format(useTime));//时、分、秒
-        orderServiceView.setUseDate(simpleDateFormat.format(useTime));//年、月、日
         orderServiceView.setUnit(orderProductDetail.getUnit() + "");
         orderServiceView.setCount(orderProductDetail.getCount() + "");
         orderServiceView.setRemarks(orderProductDetail.getRemarks());
-        // 销售价格
-        ServicePackagePriceCalendar servicePackagePriceCalendar = sServiceServiceIn.getServicePPCalendarBy(
-                orderProductDetail.getServicePackageId(), sourceOrderTime.getYear() + 1900, sourceOrderTime.getMonth() + 1, sourceOrderTime.getDate());
-        if (servicePackagePriceCalendar != null)
-            orderServiceView.setSellPrice(servicePackagePriceCalendar.getPrice() + "");
-        //成本，调整
-        ServicePackageSPriceCalendar spspc = new ServicePackageSPriceCalendar();
-        spspc.setServicePackageId(orderProductDetail.getServicePackageId());
-        spspc.setSupplierId(orderProductDetail.getSupplierId());
-        spspc.setYear(sourceOrderTime.getYear() + 1900);
-        spspc.setMonth(sourceOrderTime.getMonth() + 1);
-        spspc.setDay(sourceOrderTime.getDate());
-        List<ServicePackageSPriceCalendar> listspspc = sServiceServiceIn.getSPSPCBy(spspc);
-        if (listspspc != null && listspspc.size() == 1) {
-            orderServiceView.setPrimePrice(listspspc.get(0).getPrice() + "");
-            orderServiceView.setMoneyType(listspspc.get(0).getMoneyType() + "");
+        Timestamp useTime = orderProductDetail.getUseTime();
+        if (useTime != null) {
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            SimpleDateFormat simpleDateFormat1 = new SimpleDateFormat("HH:mm:ss");
+            orderServiceView.setUseHms(simpleDateFormat1.format(useTime));//时、分、秒
+//            orderServiceView.setUseDate(simpleDateFormat.format(useTime));//年、月、日
+            orderServiceView.setUseDate(sdf.format(useTime));
+            // 销售价格
+            ServicePackagePriceCalendar servicePackagePriceCalendar = sServiceServiceIn.getServicePPCalendarBy(
+                    orderProductDetail.getServicePackageId(), useTime.getYear() + 1900, useTime.getMonth() + 1, useTime.getDate());
+            if (servicePackagePriceCalendar != null)
+                orderServiceView.setSellPrice(servicePackagePriceCalendar.getPrice() + "");
+            //成本价格
+            ServicePackageSPriceCalendar spspc = new ServicePackageSPriceCalendar();
+            spspc.setServicePackageId(orderProductDetail.getServicePackageId());
+            spspc.setSupplierId(orderProductDetail.getSupplierId());
+            spspc.setYear(useTime.getYear() + 1900);
+            spspc.setMonth(useTime.getMonth() + 1);
+            spspc.setDay(useTime.getDate());
+            List<ServicePackageSPriceCalendar> listspspc = sServiceServiceIn.getSPSPCBy(spspc);
+            if (listspspc != null && listspspc.size() == 1) {
+                orderServiceView.setPrimePrice(listspspc.get(0).getPrice() + "");
+                orderServiceView.setMoneyType(listspspc.get(0).getMoneyType() + "");
+            }
+        }
+        //价格调整
+        if (orderProductDetail.getChangePriceFlag() == 1) {
+            //成本价格调整
+            OrderItem orderItem = new OrderItem();
+            orderItem.setSourceId(orderProductDetail.getId());
+            List<OrderItem> listoi = orderServiceIn.getOrderItemBy(orderItem);
+            if (listoi != null && listoi.size() == 1)
+                orderServiceView.setSellPriceModify(listoi.get(0).getAmount() + "");
+            //销售价格调整
+            OrderPrimeItem orderPrimeItem = new OrderPrimeItem();
+            orderPrimeItem.setSourceId(orderProductDetail.getId());
+            List<OrderPrimeItem> listopi = orderServiceIn.getOrderPrimeItemBy(orderPrimeItem);
+            if (listopi != null && listopi.size() == 1)
+                orderServiceView.setPrimePriceModify(listopi.get(0).getAmount() + "");
         }
         list.add(orderServiceView);
     }
@@ -177,22 +233,24 @@ public class OrderViewServiceImpl extends OrderServiceParent implements OrderVie
 
         List<OrderGeneralView> listv = new ArrayList<OrderGeneralView>();
         //时间段查询
-        if (orderListBy.getStatime() != null && orderListBy.getEndtime() != null) {
-            List<Order> list = orderServiceIn.getOrderListByTimedif(orderListBy.getStatime(), orderListBy.getEndtime());
-            for (Order orderr : list) {
-                generateOrderGeneralViews(listv, orderr);
+        if (orderListBy.getStatime().length() > 0 && orderListBy.getEndtime().length() > 0) {
+            List<OrderProductDetail> list = orderServiceIn.getOrderProductDetailByTime(orderListBy.getStatime(), orderListBy.getEndtime());
+            for (OrderProductDetail orderProductDetail : list) {
+                generateOrderGeneralViews(listv, orderServiceIn.getOrder(orderProductDetail.getOrderCode()), orderProductDetail,
+                        orderServiceIn.getOrderSubsidiary(orderProductDetail.getOrderCode()));
             }
         }
         //OrderCode查询
         String orderCode = orderListBy.getOrdercode();
         if (orderCode != null && orderCode.length() > 0) {
-            generateOrderGeneralViews(listv, orderServiceIn.getOrder(orderCode));
+            generateOrderGeneralViews(listv, orderServiceIn.getOrder(orderCode), orderServiceIn.getOrderProductDetailCarByOrderCode(orderCode),
+                    orderServiceIn.getOrderSubsidiary(orderCode));
         }
         return listv;
     }
 
     @Override
-    public void generateOrderGeneralViews(List<OrderGeneralView> list, Order order) {
+    public void generateOrderGeneralViews(List<OrderGeneralView> list, Order order, OrderProductDetail orderProductDetail, OrderSubsidiary orderSubsidiary) {
 
 
         OrderGeneralView orderGeneralView = new OrderGeneralView();
@@ -202,26 +260,27 @@ public class OrderViewServiceImpl extends OrderServiceParent implements OrderVie
         orderGeneralView.setStatus(order.getStatus() + "");
         orderGeneralView.setOrderCode(order.getCode());
 
-        OrderSubsidiary orderSubsidiary = orderServiceIn.getOrderSubsidiary(order.getCode());
-        if (orderSubsidiary == null) return;
-        orderGeneralView.setCustomerName(orderSubsidiary.getCustomerName());
-        orderGeneralView.setOrderSource(orderSubsidiary.getOrderSource());
-        orderGeneralView.setTask(orderSubsidiary.getTask());
+        if (orderSubsidiary != null) {
+            orderGeneralView.setCustomerName(orderSubsidiary.getCustomerName());
+            orderGeneralView.setOrderSource(orderSubsidiary.getOrderSource());
+            orderGeneralView.setTask(orderSubsidiary.getTask());
+        }
 
-        OrderProductDetail orderProductDetail = orderServiceIn.getOrderVehicleDetail(order.getCode());
-        if (orderProductDetail == null) return;
-        Timestamp useTime = orderProductDetail.getUseTime();
-        if (useTime == null) return;
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        SimpleDateFormat simpleDateFormat1 = new SimpleDateFormat(" HH:mm:ss");
-        orderGeneralView.setUseTime(simpleDateFormat1.format(useTime));//时、分、秒
-        orderGeneralView.setUseDay(simpleDateFormat.format(useTime));//年、月、日
-        String fromday = (useTime.getTime() - System.currentTimeMillis()) / 24 / 3600000 + "";
-        orderGeneralView.setFromDay(fromday);//距用车日时间差
+        if (orderProductDetail != null) {
+            Timestamp useTime = orderProductDetail.getUseTime();
+            if (useTime != null) {
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                SimpleDateFormat simpleDateFormat1 = new SimpleDateFormat(" HH:mm:ss");
+                orderGeneralView.setUseTime(simpleDateFormat1.format(useTime));//时、分、秒
+                orderGeneralView.setUseDay(simpleDateFormat.format(useTime));//年、月、日
+                String fromday = (useTime.getTime() - System.currentTimeMillis()) / 24 / 3600000 + "";
+                orderGeneralView.setFromDay(fromday);//距用车日时间差
+            }
+            Supplier supplier = supplierServiceIn.getSupplier(orderProductDetail.getSupplierId());
+            if (supplier != null)
+                orderGeneralView.setSupplierName(supplier.getName());
+        }
 
-        Supplier supplier = supplierServiceIn.getSupplier(orderProductDetail.getSupplierId());
-        if (supplier == null) return;
-        orderGeneralView.setSupplierName(supplier.getName());
     }
 
 
@@ -242,21 +301,29 @@ public class OrderViewServiceImpl extends OrderServiceParent implements OrderVie
             Order order = new Order();
 
             order.setCode(orderCode);//生成规则
-            order.setChildNum(Integer.parseInt(orderDetailView.getChildNum()));
-            order.setPersonNum(Integer.parseInt(orderDetailView.getPersonNum()));
+            if (orderDetailView.getChildNum() != null && orderDetailView.getChildNum().length() > 0)
+                order.setChildNum(Integer.parseInt(orderDetailView.getChildNum()));
+            if (orderDetailView.getPersonNum() != null && orderDetailView.getPersonNum().length() > 0)
+                order.setPersonNum(Integer.parseInt(orderDetailView.getPersonNum()));
             order.setPhone(orderDetailView.getPhone());
-            order.setProductId(Long.parseLong(orderDetailView.getProductId()));
+            if (orderDetailView.getProductId() != null && orderDetailView.getProductId().length() > 0)
+                order.setProductId(Long.parseLong(orderDetailView.getProductId()));
             order.setProductTitle(orderDetailView.getProductTitle()); //产品Title
-            order.setUserId(Long.parseLong(orderDetailView.getUserId()));
-            order.setDayNum(Integer.parseInt(orderDetailView.getDayNum()));
+            if (orderDetailView.getUserId() != null && orderDetailView.getUserId().length() > 0)
+                order.setUserId(Long.parseLong(orderDetailView.getUserId()));
+            if (orderDetailView.getDayNum() != null && orderDetailView.getDayNum().length() > 0)
+                order.setDayNum(Integer.parseInt(orderDetailView.getDayNum()));
 
             order.setTripDate(orderDetailView.getTripDate());
-            order.setAmount(new BigDecimal(orderDetailView.getAmount()));//订单总金额
-            order.setPayAmount(new BigDecimal("0.22"));//支付总金额
+            if (orderDetailView.getAmount() != null && orderDetailView.getAmount().length() > 0)
+                order.setAmount(new BigDecimal(orderDetailView.getAmount()));//订单总金额
+            order.setPayAmount(new BigDecimal("0.0"));//支付总金额
             order.setTripBegin(orderDetailView.getTripBegin());
             order.setRemarks(orderDetailView.getRemarks());
-            order.setPayTime(new Timestamp(sdf.parse(orderDetailView.getSourceOrderTime()).getTime())); //支付时间--下单时间
-            order.setStatus(ORDERSTATUS_CREATE);//订单状态（创建）
+            if (orderDetailView.getSourceOrderTime() != null && orderDetailView.getSourceOrderTime().length() > 0)
+                order.setPayTime(new Timestamp(sdf.parse(orderDetailView.getSourceOrderTime()).getTime())); //支付时间--下单时间
+            if (orderDetailView.getStatus() != null && orderDetailView.getStatus().length() > 0)
+                order.setStatus(Integer.parseInt(orderDetailView.getStatus()));//订单状态（创建）
 
 
             //order_subsidiary表
@@ -267,29 +334,65 @@ public class OrderViewServiceImpl extends OrderServiceParent implements OrderVie
             orderSubsidiary.setCustomerEmail(orderDetailView.getCustomerEmail());
             orderSubsidiary.setCustomerName(orderDetailView.getCustomerName());
             orderSubsidiary.setFlightNum(orderDetailView.getFlightNum());
-            orderSubsidiary.setFlightTime(new Timestamp(sdf.parse(orderDetailView.getFlightTime()).getTime()));
+            if (orderDetailView.getFlightTime() != null && orderDetailView.getFlightTime().length() > 0)
+                orderSubsidiary.setFlightTime(new Timestamp(sdf.parse(orderDetailView.getFlightTime()).getTime()));
             orderSubsidiary.setOrderSource(orderDetailView.getOrderSource());
             orderSubsidiary.setOutId(orderDetailView.getOutId());
             orderSubsidiary.setPhoneLocal(orderDetailView.getPhoneLocal());
             orderSubsidiary.setReceivePlace(orderDetailView.getReceivePlace());
             orderSubsidiary.setRemarksPlace(orderDetailView.getRemarksPlace());//地点json
             orderSubsidiary.setRemind(orderDetailView.getRemind());
-            orderSubsidiary.setSourceOrderTime(new Timestamp(sdf.parse(orderDetailView.getSourceOrderTime()).getTime()));
+            if (orderDetailView.getSourceOrderTime() != null && orderDetailView.getSourceOrderTime().length() > 0)
+                orderSubsidiary.setSourceOrderTime(new Timestamp(sdf.parse(orderDetailView.getSourceOrderTime()).getTime()));
             orderSubsidiary.setTask(orderDetailView.getTask());
             orderSubsidiary.setOrderPics(orderDetailView.getOrderPics());
+
+            if (orderDetailView.getOrderSubsidiaryId() != null && orderDetailView.getOrderSubsidiaryId().length() > 0) {
+                orderServiceIn.updateOSById(orderSubsidiary);
+            } else {
+                orderServiceIn.insertOrderSubsidiary(orderSubsidiary);
+            }
+
 
             //order_detail表 车信息
             OrderProductDetail orderProductDetail = new OrderProductDetail();
 
+            if (orderDetailView.getOrderProductDetailId() != null && orderDetailView.getOrderProductDetailId().length() != 0)
+                orderProductDetail.setId(Long.parseLong(orderDetailView.getOrderProductDetailId()));
             orderProductDetail.setOrderCode(orderCode);
-            orderProductDetail.setVehiclePackageId(Long.parseLong(orderDetailView.getVehiclePackageId()));
+            if (orderDetailView.getVehiclePackageId() != null && orderDetailView.getVehiclePackageId().length() > 0) {
+                orderProductDetail.setVehiclePackageId(Long.parseLong(orderDetailView.getVehiclePackageId()));
+            } else {
+                orderProductDetail.setVehiclePackageId(1L);
+            }
             orderProductDetail.setServiceId(0L);
             orderProductDetail.setServicePackageId(0L);
             orderProductDetail.setCount(1);
-            orderProductDetail.setSupplierId(Long.parseLong(orderDetailView.getSupplierId()));
+            if (orderDetailView.getSupplierId() != null && orderDetailView.getSupplierId().length() > 0)
+                orderProductDetail.setSupplierId(Long.parseLong(orderDetailView.getSupplierId()));
             orderProductDetail.setPathId(0L);//没有用到
-            orderProductDetail.setUseTime(new Timestamp(sdf.parse(orderDetailView.getUseTime()).getTime()));
-            orderProductDetail.setStatus(ORDERSTATUS_CREATE);
+            if (orderDetailView.getUseTime() != null && orderDetailView.getUseTime().length() > 0)
+                orderProductDetail.setUseTime(new Timestamp(sdf.parse(orderDetailView.getUseTime()).getTime()));
+            if (orderDetailView.getCarStatus() != null && orderDetailView.getCarStatus().length() > 0)
+                orderProductDetail.setStatus(Integer.parseInt(orderDetailView.getCarStatus()));
+            if (!"".equals(orderDetailView.getPrimePriceModify()) || !"".equals(orderDetailView.getSellPriceModify())) {
+                orderProductDetail.setChangePriceFlag(1);
+            }
+            //数据持久
+            if (flag) {
+                orderServiceIn.insertOrder(order);
+                orderServiceIn.insertOrderProductDetail(orderProductDetail);
+            } else {
+                orderServiceIn.updateOById(order);
+                orderServiceIn.updateOrderProductDetail(orderProductDetail);
+            }
+
+            //存放价格调整值
+            net.sf.json.JSONArray jsonArray = new net.sf.json.JSONArray();
+            net.sf.json.JSONObject jsonp = new net.sf.json.JSONObject();
+            jsonp.accumulate(PRIMEPRICEMODIFY, orderDetailView.getPrimePriceModify() + "");
+            jsonp.accumulate(SELLPRICEMODIFY, orderDetailView.getSellPriceModify() + "");
+            jsonArray.add(jsonp);
 
             opdlist.add(orderProductDetail);
 
@@ -298,29 +401,69 @@ public class OrderViewServiceImpl extends OrderServiceParent implements OrderVie
 
             for (OrderServiceView orderServiceView : list) {
                 OrderProductDetail orderPDetail = new OrderProductDetail();
+                if (orderServiceView.getOrderProductDetailId() != null && orderServiceView.getOrderProductDetailId().length() != 0)
+                    orderPDetail.setId(Long.parseLong(orderServiceView.getOrderProductDetailId()));
                 orderPDetail.setOrderCode(orderCode);
-                orderPDetail.setUnit(Integer.parseInt(orderServiceView.getUnit()));
+                if (orderServiceView.getUnit() != null && orderServiceView.getUnit().length() > 0)
+                    orderPDetail.setUnit(Integer.parseInt(orderServiceView.getUnit()));
                 orderPDetail.setUnitPrice(new BigDecimal(0));
-                orderPDetail.setSupplierId(Long.parseLong(orderServiceView.getSupplierId()));
-                orderPDetail.setCount(Integer.parseInt(orderServiceView.getCount()));
-                orderPDetail.setServicePackageId(Long.parseLong(orderServiceView.getServicePackageId()));
-                orderPDetail.setServiceId(Long.parseLong(orderServiceView.getServiceId()));
+                if (orderServiceView.getSupplierId() != null && orderServiceView.getSupplierId().length() > 0)
+                    orderPDetail.setSupplierId(Long.parseLong(orderServiceView.getSupplierId()));
+                if (orderServiceView.getCount() != null && orderServiceView.getCount().length() > 0)
+                    orderPDetail.setCount(Integer.parseInt(orderServiceView.getCount()));
+                if (orderServiceView.getServicePackageId() != null && orderServiceView.getServicePackageId().length() > 0) {
+                    orderPDetail.setServicePackageId(Long.parseLong(orderServiceView.getServicePackageId()));
+                } else {
+                    orderPDetail.setServicePackageId(10000L);
+                }
+                if (orderServiceView.getServiceId() != null && orderServiceView.getServiceId().length() > 0) {
+                    orderPDetail.setServiceId(Long.parseLong(orderServiceView.getServiceId()));
+                } else {
+                    orderPDetail.setServiceId(10000L);
+                }
                 orderPDetail.setRemarks(orderServiceView.getRemarks());
-                orderPDetail.setStatus(Integer.parseInt(orderServiceView.getStatus()));//订单状态  （创建）
-                orderPDetail.setUseTime(new Timestamp(sdf.parse(orderServiceView.getUseTime()).getTime()));
+                if (orderServiceView.getStatus() != null && orderServiceView.getStatus().length() > 0)
+                    orderPDetail.setStatus(Integer.parseInt(orderServiceView.getStatus()));//订单状态  （创建）
+                if (!"".equals(orderServiceView.getUseTime()))
+                    orderPDetail.setUseTime(new Timestamp(sdf.parse(orderServiceView.getUseTime()).getTime()));
+                if (!"".equals(orderServiceView.getPrimePriceModify()) || !"".equals(orderServiceView.getSellPriceModify())) {
+                    orderPDetail.setChangePriceFlag(1);
+                }
+
+                if (orderServiceView.getOrderProductDetailId() != null && orderServiceView.getOrderProductDetailId().length() > 0) {
+                    orderServiceIn.updateOrderProductDetail(orderPDetail);
+                } else {
+                    orderServiceIn.insertOrderProductDetail(orderPDetail);
+                }
+
+
+                net.sf.json.JSONObject jsons = new net.sf.json.JSONObject();
+                jsons.accumulate(PRIMEPRICEMODIFY, orderServiceView.getPrimePriceModify() + "");
+                jsons.accumulate(SELLPRICEMODIFY, orderServiceView.getSellPriceModify() + "");
+                jsonArray.add(jsons);
+
                 opdlist.add(orderPDetail);
             }
 
-            if (flag) {
-                orderServiceIn.insertOrderSubsidiary(orderSubsidiary);
-                orderServiceIn.insertOrder(order);
-                orderServiceIn.insertOrderProductDetails(opdlist);
-            } else {
-                //更新订单
-                orderServiceIn.updateOById(order);
-                orderServiceIn.updateOSById(orderSubsidiary);
-                orderServiceIn.updateOPById(opdlist);
+
+            for (int i = 0; i < opdlist.size(); i++) {
+                net.sf.json.JSONObject json = jsonArray.getJSONObject(i);
+                if (json.getString(PRIMEPRICEMODIFY) != null && json.getString(PRIMEPRICEMODIFY).length() > 0) {
+                    OrderPrimeItem orderPrimeItem = new OrderPrimeItem();
+                    orderPrimeItem.setOrderCode(orderCode);
+                    orderPrimeItem.setSourceId(opdlist.get(i).getId());
+                    orderPrimeItem.setAmount(new BigDecimal(json.getString(PRIMEPRICEMODIFY)));
+                    orderServiceIn.insertOrUpdateOrderPrimeItem(orderPrimeItem);
+                }
+                if (json.getString(SELLPRICEMODIFY) != null && json.getString(SELLPRICEMODIFY).length() > 0) {
+                    OrderItem orderItem = new OrderItem();
+                    orderItem.setOrderCode(orderCode);
+                    orderItem.setSourceId(opdlist.get(i).getId());
+                    orderItem.setAmount(new BigDecimal(json.getString(SELLPRICEMODIFY)));
+                    orderServiceIn.insertOrUpdateOrderItem(orderItem);
+                }
             }
+
         } catch (Exception e) {
             e.printStackTrace();
         }

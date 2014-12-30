@@ -39,7 +39,8 @@ public class SServiceServiceImpl implements SServiceServiceIn {
         sppc.setYear(year);
         sppc.setMonth(month);
         sppc.setDay(day);
-        return servicePackagePriceCalendarMapper.getSPPCBy(sppc).get(0);
+        List<ServicePackagePriceCalendar> list = servicePackagePriceCalendarMapper.getSPPCBy(sppc);
+        return (list !=null && list.size()==1)?list.get(0):null;
         // return getSPPCById(servicePackageId);
     }
     @Override

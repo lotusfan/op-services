@@ -9,4 +9,6 @@ import java.util.List;
  */
 public interface OrderItemMapper {
     public List<OrderItem> getBy(OrderItem orderItem);
+
+    public Long save(OrderItem orderItem);
 }

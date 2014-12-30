@@ -119,4 +119,12 @@
             </if>
         </trim>
     </select>
+    <select id="getByTime" parameterType="java.lang.String" resultMap="orderProductDetailResultMap">
+        SELECT * from order_product_detail
+        where vehicle_package_id > 0  and  use_time BETWEEN #{0} AND #{1};
+    </select>
+    <select id="getCarByOrderCode" parameterType="java.lang.String" resultMap="orderProductDetailResultMap">
+        select  * from order_product_detail
+        where vehicle_package_id > 0 and order_code = #{orderCode};
+    </select>
 </mapper>

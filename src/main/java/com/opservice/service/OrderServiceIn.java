@@ -1,8 +1,7 @@
 package com.opservice.service;
 
-import com.yellowcar.entities.Order;
-import com.yellowcar.entities.OrderProductDetail;
-import com.yellowcar.entities.OrderSubsidiary;
+import com.yellowcar.api.op.OrderPriceIn;
+import com.yellowcar.entities.*;
 
 import java.util.List;
 
@@ -36,5 +35,21 @@ public interface OrderServiceIn {
     public void updateOById(Order order);
 
     public void updateOPById(List<OrderProductDetail> list);
+
+    public List<OrderItem> getOrderItemBy(OrderItem orderItem);
+
+    public List<OrderPrimeItem> getOrderPrimeItemBy(OrderPrimeItem orderPrimeItem);
+
+    public Long insertOrUpdateOrderPrimeItem(OrderPrimeItem orderPrimeItem);
+
+    public Long insertOrUpdateOrderItem(OrderItem orderItem);
+
+    public void insertOrderProductDetail(OrderProductDetail orderProductDetail);
+
+    public void updateOrderProductDetail(OrderProductDetail orderProductDetail);
+
+    public List<OrderProductDetail> getOrderProductDetailByTime(String startTime, String endTime);
+
+    public OrderProductDetail getOrderProductDetailCarByOrderCode(String orderCode);
 
 }

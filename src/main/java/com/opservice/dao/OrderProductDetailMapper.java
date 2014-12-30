@@ -16,4 +16,8 @@ public interface OrderProductDetailMapper {
 
     public List<OrderProductDetail> getBy(OrderProductDetail detail);
 
+    public List<OrderProductDetail> getByTime(String startTime, String endTime);
+
+    public OrderProductDetail getCarByOrderCode(String orderCode);
+
 }
