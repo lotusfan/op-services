@@ -1,7 +1,9 @@
 package com.opservice.service;
 
+import com.yellowcar.api.op.OrderListBy;
 import com.yellowcar.api.op.OrderPriceIn;
 import com.yellowcar.entities.*;
+import com.yellowcar.view.OrderGeneralView;
 
 import java.util.List;
 
@@ -51,5 +53,7 @@ public interface OrderServiceIn {
     public List<OrderProductDetail> getOrderProductDetailByTime(String startTime, String endTime);
 
     public OrderProductDetail getOrderProductDetailCarByOrderCode(String orderCode);
+
+    public List<OrderGeneralView> getOrderGeneralViewBy(OrderListBy orderListBy);
 
 }

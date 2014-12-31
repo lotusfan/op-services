@@ -2,7 +2,9 @@ package com.opservice.service.Impl;
 
 import com.opservice.dao.*;
 import com.opservice.service.OrderServiceIn;
+import com.yellowcar.api.op.OrderListBy;
 import com.yellowcar.entities.*;
+import com.yellowcar.view.OrderGeneralView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +26,8 @@ public class OrderServiceImpl implements OrderServiceIn {
     private OrderItemMapper orderItemMapper;
     @Autowired
     private OrderPrimeItemMapper orderPrimeItemMapper;
+    @Autowired
+    private OrderGeneralViewMapper orderGeneralViewMapper;
 
     @Override
     public List<Order> getOrderList() {
@@ -149,5 +153,10 @@ public class OrderServiceImpl implements OrderServiceIn {
     public OrderProductDetail getOrderProductDetailCarByOrderCode(String orderCode) {
 
         return orderProductDetailMapper.getCarByOrderCode(orderCode);
+    }
+
+    @Override
+    public List<OrderGeneralView> getOrderGeneralViewBy(OrderListBy orderListBy) {
+        return orderGeneralViewMapper.getBy(orderListBy);
     }
 }

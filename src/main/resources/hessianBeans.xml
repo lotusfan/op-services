@@ -28,7 +28,6 @@
     </bean>
 
     <bean id="bigDecimalSerializerFactory" class="com.yellowcar.utils.SerializerFactory"/>
-
     <bean id="hessianOrderViewService" class="com.opservice.service.Impl.OrderViewServiceImpl" />
     <bean id="hessianOrderOptionalService" class="com.opservice.service.Impl.OrderOptionalServiceImpl"/>
     <bean id="hessianOrderPrice" class="com.opservice.service.Impl.OrderPriceImpl"/>

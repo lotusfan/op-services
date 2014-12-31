@@ -15,6 +15,8 @@ import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -231,13 +233,65 @@ public class OrderViewServiceImpl extends OrderServiceParent implements OrderVie
     @Override
     public List<OrderGeneralView> getOrderGeneralViews(OrderListBy orderListBy) {
 
-        List<OrderGeneralView> listv = new ArrayList<OrderGeneralView>();
-        //时间段查询
+//        List<OrderGeneralView> listv = new ArrayList<OrderGeneralView>();
+        if (orderListBy.getStatime() == null || orderListBy.getStatime().length() == 0) {
+            Calendar calendar = Calendar.getInstance();
+            try {
+                calendar.set(Calendar.MONTH, calendar.get(Calendar.MONTH)-3);
+                orderListBy.setStatime(new SimpleDateFormat("yyyy-MM-dd").format(calendar.getTime()));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        if (orderListBy.getEndtime() == null || orderListBy.getEndtime().length() == 0) {
+            Calendar calendar = Calendar.getInstance();
+            try {
+                calendar.set(Calendar.MONTH, calendar.get(Calendar.MONTH)+3);
+                orderListBy.setEndtime(new SimpleDateFormat("yyyy-MM-dd").format(calendar.getTime()));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (orderListBy.getCustomername() != null && orderListBy.getCustomername().length() > 0) {
+            orderListBy.setCustomername("%"+orderListBy.getCustomername().replaceAll(" ","%")+"%");
+        }
+
+        List<OrderGeneralView> list = orderServiceIn.getOrderGeneralViewBy(orderListBy);
+        if (list != null) {
+            for (OrderGeneralView orderGeneralView : list) {
+                    Timestamp useTime = orderGeneralView.getUseTime();
+                    if (useTime != null) {
+                        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                        SimpleDateFormat simpleDateFormat1 = new SimpleDateFormat(" HH:mm:ss");
+                        orderGeneralView.setUseHms(simpleDateFormat1.format(useTime));//时、分、秒
+                        orderGeneralView.setUseDay(simpleDateFormat.format(useTime));//年、月、日
+                        try {
+                            Date date = simpleDateFormat.parse(simpleDateFormat.format(new Date()));
+                            Date date1 = simpleDateFormat.parse(orderGeneralView.getUseDay());
+                            String fromday = (date1.getTime() - date.getTime()) / 24 / 3600000 + "";
+                            orderGeneralView.setFromDay(fromday);//距用车日时间差
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                if(orderGeneralView.getSupplierId() != null && orderGeneralView.getSupplierId().length() > 0){
+                    Supplier supplier = supplierServiceIn.getSupplier(Long.parseLong(orderGeneralView.getSupplierId()));
+                    if (supplier != null)
+                        orderGeneralView.setSupplierName(supplier.getName());
+                }
+
+            }
+        }
+        return list;
+       /* //时间段查询
         if (orderListBy.getStatime().length() > 0 && orderListBy.getEndtime().length() > 0) {
             List<OrderProductDetail> list = orderServiceIn.getOrderProductDetailByTime(orderListBy.getStatime(), orderListBy.getEndtime());
-            for (OrderProductDetail orderProductDetail : list) {
-                generateOrderGeneralViews(listv, orderServiceIn.getOrder(orderProductDetail.getOrderCode()), orderProductDetail,
-                        orderServiceIn.getOrderSubsidiary(orderProductDetail.getOrderCode()));
+            if (list != null) {
+                for (OrderProductDetail orderProductDetail : list) {
+                    generateOrderGeneralViews(listv, orderServiceIn.getOrder(orderProductDetail.getOrderCode()), orderProductDetail,
+                            orderServiceIn.getOrderSubsidiary(orderProductDetail.getOrderCode()));
+                }
             }
         }
         //OrderCode查询
@@ -245,10 +299,12 @@ public class OrderViewServiceImpl extends OrderServiceParent implements OrderVie
         if (orderCode != null && orderCode.length() > 0) {
             generateOrderGeneralViews(listv, orderServiceIn.getOrder(orderCode), orderServiceIn.getOrderProductDetailCarByOrderCode(orderCode),
                     orderServiceIn.getOrderSubsidiary(orderCode));
-        }
-        return listv;
+        }*/
     }
 
+    /*
+    旧方法   弃用
+     */
     @Override
     public void generateOrderGeneralViews(List<OrderGeneralView> list, Order order, OrderProductDetail orderProductDetail, OrderSubsidiary orderSubsidiary) {
 
@@ -257,7 +313,7 @@ public class OrderViewServiceImpl extends OrderServiceParent implements OrderVie
         list.add(orderGeneralView);
 
         orderGeneralView.setProductTitle(order.getProductTitle());
-        orderGeneralView.setStatus(order.getStatus() + "");
+        orderGeneralView.setOrderStatus(order.getStatus() + "");
         orderGeneralView.setOrderCode(order.getCode());
 
         if (orderSubsidiary != null) {
@@ -271,10 +327,16 @@ public class OrderViewServiceImpl extends OrderServiceParent implements OrderVie
             if (useTime != null) {
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
                 SimpleDateFormat simpleDateFormat1 = new SimpleDateFormat(" HH:mm:ss");
-                orderGeneralView.setUseTime(simpleDateFormat1.format(useTime));//时、分、秒
+                orderGeneralView.setUseHms(simpleDateFormat1.format(useTime));//时、分、秒
                 orderGeneralView.setUseDay(simpleDateFormat.format(useTime));//年、月、日
-                String fromday = (useTime.getTime() - System.currentTimeMillis()) / 24 / 3600000 + "";
-                orderGeneralView.setFromDay(fromday);//距用车日时间差
+                try {
+                    Date date = simpleDateFormat.parse(simpleDateFormat.format(new Date()));
+                    Date date1 = simpleDateFormat.parse(orderGeneralView.getUseDay());
+                    String fromday = (date.getTime() - date1.getTime()) / 24 / 3600000 + "";
+                    orderGeneralView.setFromDay(fromday);//距用车日时间差
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
             Supplier supplier = supplierServiceIn.getSupplier(orderProductDetail.getSupplierId());
             if (supplier != null)
