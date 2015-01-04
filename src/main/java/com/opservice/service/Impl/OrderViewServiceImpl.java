@@ -86,9 +86,14 @@ public class OrderViewServiceImpl extends OrderServiceParent implements OrderVie
                 for (int i = 0; i < jsonArray.size(); i++) {
                     RemarksPlace remarksPlace = new RemarksPlace();
                     JSONObject jsonObject = jsonArray.getJSONObject(i);
-                    remarksPlace.setDestination(jsonObject.getString("destination"));
-                    remarksPlace.setDeaddress(jsonObject.getString("deaddress"));
-                    remarksPlace.setGtime(jsonObject.getString("gtime"));
+                    if (jsonObject.containsKey("destination"))
+                        remarksPlace.setDestination(jsonObject.getString("destination"));
+                    if (jsonObject.containsKey("deaddress"))
+                        remarksPlace.setDeaddress(jsonObject.getString("deaddress"));
+                    if (jsonObject.containsKey("gtime"))
+                        remarksPlace.setGtime(jsonObject.getString("gtime"));
+                    if (jsonObject.containsKey("phone"))
+                        remarksPlace.setPhone(jsonObject.getString("phone"));
                     listrp.add(remarksPlace);
                 }
             }
@@ -237,7 +242,7 @@ public class OrderViewServiceImpl extends OrderServiceParent implements OrderVie
         if (orderListBy.getStatime() == null || orderListBy.getStatime().length() == 0) {
             Calendar calendar = Calendar.getInstance();
             try {
-                calendar.set(Calendar.MONTH, calendar.get(Calendar.MONTH)-3);
+                calendar.set(Calendar.MONTH, calendar.get(Calendar.MONTH) - 3);
                 orderListBy.setStatime(new SimpleDateFormat("yyyy-MM-dd").format(calendar.getTime()));
             } catch (Exception e) {
                 e.printStackTrace();
@@ -246,7 +251,7 @@ public class OrderViewServiceImpl extends OrderServiceParent implements OrderVie
         if (orderListBy.getEndtime() == null || orderListBy.getEndtime().length() == 0) {
             Calendar calendar = Calendar.getInstance();
             try {
-                calendar.set(Calendar.MONTH, calendar.get(Calendar.MONTH)+3);
+                calendar.set(Calendar.MONTH, calendar.get(Calendar.MONTH) + 3);
                 orderListBy.setEndtime(new SimpleDateFormat("yyyy-MM-dd").format(calendar.getTime()));
             } catch (Exception e) {
                 e.printStackTrace();
@@ -254,28 +259,28 @@ public class OrderViewServiceImpl extends OrderServiceParent implements OrderVie
         }
 
         if (orderListBy.getCustomername() != null && orderListBy.getCustomername().length() > 0) {
-            orderListBy.setCustomername("%"+orderListBy.getCustomername().replaceAll(" ","%")+"%");
+            orderListBy.setCustomername("%" + orderListBy.getCustomername().replaceAll(" ", "%") + "%");
         }
 
         List<OrderGeneralView> list = orderServiceIn.getOrderGeneralViewBy(orderListBy);
         if (list != null) {
             for (OrderGeneralView orderGeneralView : list) {
-                    Timestamp useTime = orderGeneralView.getUseTime();
-                    if (useTime != null) {
-                        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                        SimpleDateFormat simpleDateFormat1 = new SimpleDateFormat(" HH:mm:ss");
-                        orderGeneralView.setUseHms(simpleDateFormat1.format(useTime));//时、分、秒
-                        orderGeneralView.setUseDay(simpleDateFormat.format(useTime));//年、月、日
-                        try {
-                            Date date = simpleDateFormat.parse(simpleDateFormat.format(new Date()));
-                            Date date1 = simpleDateFormat.parse(orderGeneralView.getUseDay());
-                            String fromday = (date1.getTime() - date.getTime()) / 24 / 3600000 + "";
-                            orderGeneralView.setFromDay(fromday);//距用车日时间差
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
+                Timestamp useTime = orderGeneralView.getUseTime();
+                if (useTime != null) {
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                    SimpleDateFormat simpleDateFormat1 = new SimpleDateFormat(" HH:mm:ss");
+                    orderGeneralView.setUseHms(simpleDateFormat1.format(useTime));//时、分、秒
+                    orderGeneralView.setUseDay(simpleDateFormat.format(useTime));//年、月、日
+                    try {
+                        Date date = simpleDateFormat.parse(simpleDateFormat.format(new Date()));
+                        Date date1 = simpleDateFormat.parse(orderGeneralView.getUseDay());
+                        String fromday = (date1.getTime() - date.getTime()) / 24 / 3600000 + "";
+                        orderGeneralView.setFromDay(fromday);//距用车日时间差
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                if(orderGeneralView.getSupplierId() != null && orderGeneralView.getSupplierId().length() > 0){
+                }
+                if (orderGeneralView.getSupplierId() != null && orderGeneralView.getSupplierId().length() > 0) {
                     Supplier supplier = supplierServiceIn.getSupplier(Long.parseLong(orderGeneralView.getSupplierId()));
                     if (supplier != null)
                         orderGeneralView.setSupplierName(supplier.getName());
@@ -414,7 +419,6 @@ public class OrderViewServiceImpl extends OrderServiceParent implements OrderVie
             } else {
                 orderServiceIn.insertOrderSubsidiary(orderSubsidiary);
             }
-
 
             //order_detail表 车信息
             OrderProductDetail orderProductDetail = new OrderProductDetail();

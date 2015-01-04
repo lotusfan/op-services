@@ -27,7 +27,9 @@
         <result column="image_num" property="imageNum" />
         <result column="source_order_time" property="sourceOrderTime" />
         <result column="order_pics" property="orderPics" />
-
+        <result column="customer_name_py" property="customerNamePy"/>
+        <result column="trip_detail" property="tripDetail"/>
+        <result column="trip_phone" property="tripPhone"/>
     </resultMap>
 
 
@@ -57,6 +59,9 @@
             <if test="imageNum != null"> `image_num` ,</if>
             <if test="sourceOrderTime != null"> `source_order_time` ,</if>
             <if test="orderPics != null">`order_pics`,</if>
+            <if test="customerNamePy != null">`customer_name_py`,</if>
+            <if test="tripDetail != null">`trip_detail`,</if>
+            <if test="tripPhone != null">`trip_phone`</if>
 
         </trim>
         )values(
@@ -77,6 +82,9 @@
             <if test="imageNum != null"> #{imageNum} ,</if>
             <if test="sourceOrderTime != null"> #{sourceOrderTime} ,</if>
             <if test="orderPics != null">#{orderPics} ,</if>
+            <if test="customerNamePy != null">#{customerNamePy} ,</if>
+            <if test="tripDetail != null">#{tripDetail},</if>
+            <if test="tripPhone != null">#{tripPhone}</if>
         </trim>
         )
     </insert>
@@ -100,6 +108,9 @@
             <if test="imageNum != null">`image_num`= #{imageNum} ,</if>
             <if test="sourceOrderTime != null">`source_order_time`= #{sourceOrderTime} ,</if>
             <if test="orderPics != null">`order_pics`= #{orderPics} ,</if>
+            <if test="customerNamePy != null">`customer_name_py`=#{customerNamePy} ,</if>
+            <if test="tripDetail != null">`trip_detail`=#{tripDetail} ,</if>
+            <if test="tripPhone != null">`trip_phone` = #{tripPhone}</if>
         </trim>
 		where order_code = #{orderCode}
 	</update>
