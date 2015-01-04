@@ -44,7 +44,7 @@ public class OrderPriceImpl implements OrderPriceIn {
             vspc.setVehiclePackageId(Long.parseLong(vehiclePackageId));
             vspc.setSupplierId(Long.parseLong(supplierId));
             vspc.setYear(calendar.get(Calendar.YEAR));
-            vspc.setMonth(calendar.get(Calendar.MONTH)+1);
+            vspc.setMonth(calendar.get(Calendar.MONTH) + 1);
             vspc.setDay(calendar.get(Calendar.DAY_OF_MONTH));
             List<VehicleSupplierPriceCalendar> listvspcs = vehicleServiceIn.getVehicleSPCBy(vspc);
             jsonObject.put(PRIMEPRICE, listvspcs.get(0).getPrice());
@@ -53,13 +53,25 @@ public class OrderPriceImpl implements OrderPriceIn {
             VehiclePriceCalendar vpc = new VehiclePriceCalendar();
             vpc.setVehiclePackageId(Long.parseLong(vehiclePackageId));
             vpc.setYear(calendar.get(Calendar.YEAR));
-            vpc.setMonth(calendar.get(Calendar.MONTH )+1);
+            vpc.setMonth(calendar.get(Calendar.MONTH) + 1);
             vpc.setDay(calendar.get(Calendar.DAY_OF_MONTH));
             List<VehiclePriceCalendar> listvpcs = vehicleServiceIn.getVPCBy(vpc);
             jsonObject.put(SELLPRICE, listvpcs.get(0).getPrice());
 
             VehiclePackage vp = vehicleServiceIn.getVehiclePackage(Long.parseLong(vehiclePackageId));
-            jsonObject.put(UNIT, vp.getUnit());
+            if (vp.getUnit() != null)
+                switch (vp.getUnit()) {
+                    case 0:
+                        jsonObject.put(UNIT, "天");
+                        break;
+                    case 1:
+                        jsonObject.put(UNIT, "/人/天");
+                        break;
+                    case 2:
+                        jsonObject.put(UNIT, "人（份）");
+                        break;
+                }
+//            jsonObject.put(UNIT, vp.getUnit());
             return jsonObject.toString();
         } catch (Exception e) {
             e.printStackTrace();
@@ -80,7 +92,7 @@ public class OrderPriceImpl implements OrderPriceIn {
             spspc.setServicePackageId(Long.parseLong(servicePackageId));
             spspc.setSupplierId(Long.parseLong(supplierId));
             spspc.setYear(calendar.get(Calendar.YEAR));
-            spspc.setMonth(calendar.get(Calendar.MONTH)+1);
+            spspc.setMonth(calendar.get(Calendar.MONTH) + 1);
             spspc.setDay(calendar.get(Calendar.DAY_OF_MONTH));
             List<ServicePackageSPriceCalendar> listspspcs = sServiceServiceIn.getSPSPCBy(spspc);
             jsonObject.put(PRIMEPRICE, listspspcs.get(0).getPrice());
@@ -89,13 +101,25 @@ public class OrderPriceImpl implements OrderPriceIn {
             ServicePackagePriceCalendar sppc = new ServicePackagePriceCalendar();
             sppc.setServicePackageId(Long.parseLong(servicePackageId));
             sppc.setYear(calendar.get(Calendar.YEAR));
-            sppc.setMonth(calendar.get(Calendar.MONTH)+1);
+            sppc.setMonth(calendar.get(Calendar.MONTH) + 1);
             sppc.setDay(calendar.get(Calendar.DAY_OF_MONTH));
             List<ServicePackagePriceCalendar> listsppcs = sServiceServiceIn.getSPPCBy(sppc);
             jsonObject.put(SELLPRICE, listsppcs.get(0).getPrice());
 
             ServicePackage sp = sServiceServiceIn.getServicePackageById(Long.parseLong(servicePackageId));
-            jsonObject.put(UNIT, sp.getUnit());
+            switch (sp.getUnit()) {
+                case 0:
+                    jsonObject.put(UNIT, "天");
+                    break;
+                case 1:
+                    jsonObject.put(UNIT, "/人/天");
+                    break;
+                case 2:
+                    jsonObject.put(UNIT, "人（份）");
+                    break;
+            }
+
+//            jsonObject.put(UNIT, sp.getUnit());
             return jsonObject.toString();
         } catch (Exception e) {
             e.printStackTrace();

@@ -79,6 +79,9 @@ public class OrderViewServiceImpl extends OrderServiceParent implements OrderVie
             if ("".equals(orderSubsidiary.getFlightTime())) {
                 orderDetailView.setFlightTime(sdf.format(orderSubsidiary.getFlightTime()));
             }
+            orderDetailView.setTripDetail(orderSubsidiary.getTripDetail());
+            orderDetailView.setTripPhone(orderSubsidiary.getTripPhone());
+            orderDetailView.setCustomerNamePy(orderSubsidiary.getCustomerNamePy());
             orderDetailView.setRemarksPlace(orderSubsidiary.getRemarksPlace());
             orderDetailView.setOrderPics(orderSubsidiary.getOrderPics());
             JSONArray jsonArray = JSONArray.parseArray(orderSubsidiary.getRemarksPlace());
@@ -188,8 +191,19 @@ public class OrderViewServiceImpl extends OrderServiceParent implements OrderVie
             orderServiceView.setChangePriceFlag(orderProductDetail.getChangePriceFlag() + "");
         }
 
+        if (orderProductDetail.getUnit() != null)
+            switch (orderProductDetail.getUnit()) {
+                case 0:
+                    orderServiceView.setUnit("天");
+                    break;
+                case 1:
+                    orderServiceView.setUnit("/人/天");
+                    break;
+                case 2:
+                    orderServiceView.setUnit("人（份）");
+                    break;
+            }
 
-        orderServiceView.setUnit(orderProductDetail.getUnit() + "");
         orderServiceView.setCount(orderProductDetail.getCount() + "");
         orderServiceView.setRemarks(orderProductDetail.getRemarks());
         Timestamp useTime = orderProductDetail.getUseTime();
@@ -413,7 +427,9 @@ public class OrderViewServiceImpl extends OrderServiceParent implements OrderVie
                 orderSubsidiary.setSourceOrderTime(new Timestamp(sdf.parse(orderDetailView.getSourceOrderTime()).getTime()));
             orderSubsidiary.setTask(orderDetailView.getTask());
             orderSubsidiary.setOrderPics(orderDetailView.getOrderPics());
-
+            orderSubsidiary.setTripDetail(orderDetailView.getTripDetail());
+            orderSubsidiary.setTripPhone(orderDetailView.getTripPhone());
+            orderSubsidiary.setCustomerNamePy(orderDetailView.getCustomerNamePy());
             if (orderDetailView.getOrderSubsidiaryId() != null && orderDetailView.getOrderSubsidiaryId().length() > 0) {
                 orderServiceIn.updateOSById(orderSubsidiary);
             } else {
