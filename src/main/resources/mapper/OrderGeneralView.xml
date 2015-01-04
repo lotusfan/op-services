@@ -25,13 +25,13 @@
         <trim prefix="where" prefixOverrides="AND|OR">
             op.use_time between #{statime} and #{endtime} and op.vehicle_package_id > 0
             <if test="ordersource != null and ordersource != '' ">
-                AND os.order_source = #{ordersource}
+                AND os.order_source like #{ordersource}
             </if>
             <if test="ordercode != null and ordercode != '' ">
                 AND od.code = #{ordercode}
             </if>
             <if test="producttitle != null and producttitle != ''">
-                AND od.product_title = #{producttitle}
+                AND od.product_title like #{producttitle}
             </if>
             <if test="orderstatus != null and orderstatus != ''">
                 AND od.status = #{orderstatus}

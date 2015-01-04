@@ -275,6 +275,13 @@ public class OrderViewServiceImpl extends OrderServiceParent implements OrderVie
         if (orderListBy.getCustomername() != null && orderListBy.getCustomername().length() > 0) {
             orderListBy.setCustomername("%" + orderListBy.getCustomername().replaceAll(" ", "%") + "%");
         }
+        if (orderListBy.getProducttitle() != null && orderListBy.getProducttitle().length() > 0) {
+            orderListBy.setProducttitle("%" + orderListBy.getProducttitle().replaceAll(" ", "%") + "%");
+        }
+
+        if (orderListBy.getOrdersource() != null && orderListBy.getOrdersource().length() > 0) {
+            orderListBy.setOrdersource("%" + orderListBy.getOrdersource().replaceAll(" ", "%") + "%");
+        }
 
         List<OrderGeneralView> list = orderServiceIn.getOrderGeneralViewBy(orderListBy);
         if (list != null) {
