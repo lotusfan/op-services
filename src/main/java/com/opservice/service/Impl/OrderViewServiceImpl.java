@@ -39,6 +39,7 @@ public class OrderViewServiceImpl extends OrderServiceParent implements OrderVie
 
         //Order表
         Order order = orderServiceIn.getOrder(orderCode);
+        if(order == null)return null;
 
         orderDetailView.setOrderCode(order.getCode());
         orderDetailView.setChildNum(order.getChildNum() + "");

@@ -50,7 +50,7 @@ public class OrderServiceImpl implements OrderServiceIn {
         Order order = new Order();
         order.setCode(orderCode);
         List<Order> list = orderMapper.getBy(order);
-        return list.get(0);
+        return (list != null && list.size() > 0) ? list.get(0):null;
     }
 
     @Override
