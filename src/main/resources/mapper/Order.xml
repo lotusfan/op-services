@@ -47,7 +47,6 @@
             <if test="status != null"> `status` = #{status},</if>
             <if test="payTime != null"> `pay_time` = #{payTime},</if>
             <if test="settleTime != null"> `settle_time` = #{settleTime},</if>
-            <if test="createTime != null"> `create_time` = #{createTime},</if>
             <if test="status!= null"> `status` = #{status},</if>
             <if test="tripBegin!= null"> `trip_begin` = #{tripBegin},</if>
             <if test="tripEnd!= null"> `trip_end` = #{tripEnd},</if>

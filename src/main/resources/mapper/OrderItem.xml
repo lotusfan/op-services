@@ -36,7 +36,6 @@
             <if test="thirdPartDesc!= null"> `third_part_desc` = #{thirdPartDesc},</if>
             <if test="servicePackageId!= null"> `service_package_id` = #{servicePackageId},</if>
             <if test="modifyTime != null"> `modify_time` = #{modifyTime},</if>
-            <if test="createTime != null"> `create_time` = #{createTime},</if>
 		</trim>
 		where source_id = #{sourceId}
 	</update>

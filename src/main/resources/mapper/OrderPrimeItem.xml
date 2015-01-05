@@ -29,7 +29,6 @@
             <if test="charge!= null"> `charge` = #{charge},</if>
             <if test="remarks != null">`remarks` = #{remarks}</if>
             <if test="modifyTime != null"> `modify_time` = #{modifyTime},</if>
-            <if test="createTime != null"> `create_time` = #{createTime},</if>
 		</trim>
 		where source_id = #{sourceId}
 	</update>

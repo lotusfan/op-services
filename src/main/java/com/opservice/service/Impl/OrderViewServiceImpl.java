@@ -422,6 +422,7 @@ public class OrderViewServiceImpl extends OrderServiceParent implements OrderVie
                 order.setPayTime(new Timestamp(sdf.parse(orderDetailView.getSourceOrderTime()).getTime())); //支付时间--下单时间
             if (orderDetailView.getStatus() != null && orderDetailView.getStatus().length() > 0)
                 order.setStatus(Integer.parseInt(orderDetailView.getStatus()));//订单状态（创建）
+            order.setCreateTime(new Timestamp(System.currentTimeMillis()));
 
 
             //order_subsidiary表
@@ -447,6 +448,7 @@ public class OrderViewServiceImpl extends OrderServiceParent implements OrderVie
             orderSubsidiary.setTripDetail(orderDetailView.getTripDetail());
             orderSubsidiary.setTripPhone(orderDetailView.getTripPhone());
             orderSubsidiary.setCustomerNamePy(orderDetailView.getCustomerNamePy());
+            orderSubsidiary.setCreateTime(new Timestamp(System.currentTimeMillis()));
             if (orderDetailView.getOrderSubsidiaryId() != null && orderDetailView.getOrderSubsidiaryId().length() > 0) {
                 orderServiceIn.updateOSById(orderSubsidiary);
             } else {
@@ -477,6 +479,7 @@ public class OrderViewServiceImpl extends OrderServiceParent implements OrderVie
             if (!"".equals(orderDetailView.getPrimePriceModify()) || !"".equals(orderDetailView.getSellPriceModify())) {
                 orderProductDetail.setChangePriceFlag(1);
             }
+            orderProductDetail.setCreateTime(new Timestamp(System.currentTimeMillis()));
             //数据持久
             if (flag) {
                 orderServiceIn.insertOrder(order);
@@ -528,12 +531,13 @@ public class OrderViewServiceImpl extends OrderServiceParent implements OrderVie
                 if (!"".equals(orderServiceView.getPrimePriceModify()) || !"".equals(orderServiceView.getSellPriceModify())) {
                     orderPDetail.setChangePriceFlag(1);
                 }
-
+                orderPDetail.setCreateTime(new Timestamp(System.currentTimeMillis()));
                 if (orderServiceView.getOrderProductDetailId() != null && orderServiceView.getOrderProductDetailId().length() > 0) {
                     orderServiceIn.updateOrderProductDetail(orderPDetail);
                 } else {
                     orderServiceIn.insertOrderProductDetail(orderPDetail);
                 }
+
 
 
                 net.sf.json.JSONObject jsons = new net.sf.json.JSONObject();
@@ -552,6 +556,7 @@ public class OrderViewServiceImpl extends OrderServiceParent implements OrderVie
                     orderPrimeItem.setOrderCode(orderCode);
                     orderPrimeItem.setSourceId(opdlist.get(i).getId());
                     orderPrimeItem.setAmount(new BigDecimal(json.getString(PRIMEPRICEMODIFY)));
+                    orderPrimeItem.setCreateTime(new Timestamp(System.currentTimeMillis()));
                     orderServiceIn.insertOrUpdateOrderPrimeItem(orderPrimeItem);
                 }
                 if (json.getString(SELLPRICEMODIFY) != null && json.getString(SELLPRICEMODIFY).length() > 0) {
@@ -559,6 +564,7 @@ public class OrderViewServiceImpl extends OrderServiceParent implements OrderVie
                     orderItem.setOrderCode(orderCode);
                     orderItem.setSourceId(opdlist.get(i).getId());
                     orderItem.setAmount(new BigDecimal(json.getString(SELLPRICEMODIFY)));
+                    orderItem.setCreateTime(new Timestamp(System.currentTimeMillis()));
                     orderServiceIn.insertOrUpdateOrderItem(orderItem);
                 }
             }

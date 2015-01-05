@@ -61,7 +61,8 @@
             <if test="orderPics != null">`order_pics`,</if>
             <if test="customerNamePy != null">`customer_name_py`,</if>
             <if test="tripDetail != null">`trip_detail`,</if>
-            <if test="tripPhone != null">`trip_phone`</if>
+            <if test="tripPhone != null">`trip_phone`,</if>
+            <if test="createTime != null">`create_time`,</if>
 
         </trim>
         )values(
@@ -84,7 +85,8 @@
             <if test="orderPics != null">#{orderPics} ,</if>
             <if test="customerNamePy != null">#{customerNamePy} ,</if>
             <if test="tripDetail != null">#{tripDetail},</if>
-            <if test="tripPhone != null">#{tripPhone}</if>
+            <if test="tripPhone != null">#{tripPhone},</if>
+            <if test="createTime != null">#{createTime},</if>
         </trim>
         )
     </insert>
