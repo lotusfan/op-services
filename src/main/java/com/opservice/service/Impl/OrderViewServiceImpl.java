@@ -77,7 +77,7 @@ public class OrderViewServiceImpl extends OrderServiceParent implements OrderVie
             orderDetailView.setReceivePlace(orderSubsidiary.getReceivePlace());
             orderDetailView.setRemind(orderSubsidiary.getRemind());
             orderDetailView.setFlightNum(orderSubsidiary.getFlightNum());
-            if ("".equals(orderSubsidiary.getFlightTime())) {
+            if (!"".equals(orderSubsidiary.getFlightTime())) {
                 orderDetailView.setFlightTime(sdf.format(orderSubsidiary.getFlightTime()));
             }
             orderDetailView.setTripDetail(orderSubsidiary.getTripDetail());
