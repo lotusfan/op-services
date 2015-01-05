@@ -191,18 +191,22 @@ public class OrderViewServiceImpl extends OrderServiceParent implements OrderVie
             orderServiceView.setChangePriceFlag(orderProductDetail.getChangePriceFlag() + "");
         }
 
-        if (orderProductDetail.getUnit() != null)
+
+        if (orderProductDetail.getUnit() != null) {
+
+            orderServiceView.setUnit(orderProductDetail.getUnit() + "");
             switch (orderProductDetail.getUnit()) {
                 case 0:
-                    orderServiceView.setUnit("天");
+                    orderServiceView.setUnitDefinition("天");
                     break;
                 case 1:
-                    orderServiceView.setUnit("/人/天");
+                    orderServiceView.setUnitDefinition("/人份");
                     break;
                 case 2:
-                    orderServiceView.setUnit("人（份）");
+                    orderServiceView.setUnitDefinition("份");
                     break;
             }
+        }
 
         orderServiceView.setCount(orderProductDetail.getCount() + "");
         orderServiceView.setRemarks(orderProductDetail.getRemarks());
@@ -393,19 +397,24 @@ public class OrderViewServiceImpl extends OrderServiceParent implements OrderVie
                 order.setChildNum(Integer.parseInt(orderDetailView.getChildNum()));
             if (orderDetailView.getPersonNum() != null && orderDetailView.getPersonNum().length() > 0)
                 order.setPersonNum(Integer.parseInt(orderDetailView.getPersonNum()));
-            order.setPhone(orderDetailView.getPhone());
-            if (orderDetailView.getProductId() != null && orderDetailView.getProductId().length() > 0)
+            if (orderDetailView.getPhone() != null && orderDetailView.getPhone().length() > 0) {
+                order.setPhone(orderDetailView.getPhone());
+                User user = userServiceIn.getUserByPhone(orderDetailView.getPhone());
+                order.setUserId((user != null) ? user.getId() : 0L);
+            }
+            if (orderDetailView.getProductId() != null && orderDetailView.getProductId().length() > 0) {
                 order.setProductId(Long.parseLong(orderDetailView.getProductId()));
+            }
             order.setProductTitle(orderDetailView.getProductTitle()); //产品Title
-            if (orderDetailView.getUserId() != null && orderDetailView.getUserId().length() > 0)
-                order.setUserId(Long.parseLong(orderDetailView.getUserId()));
             if (orderDetailView.getDayNum() != null && orderDetailView.getDayNum().length() > 0)
                 order.setDayNum(Integer.parseInt(orderDetailView.getDayNum()));
 
             order.setTripDate(orderDetailView.getTripDate());
-            if (orderDetailView.getAmount() != null && orderDetailView.getAmount().length() > 0)
+            if (orderDetailView.getAmount() != null && orderDetailView.getAmount().length() > 0) {
                 order.setAmount(new BigDecimal(orderDetailView.getAmount()));//订单总金额
-            order.setPayAmount(new BigDecimal("0.0"));//支付总金额
+                order.setPayAmount(order.getAmount());//支付总金额
+                order.setFinalAmount(order.getAmount());
+            }
             order.setTripBegin(orderDetailView.getTripBegin());
             order.setRemarks(orderDetailView.getRemarks());
             if (orderDetailView.getSourceOrderTime() != null && orderDetailView.getSourceOrderTime().length() > 0)

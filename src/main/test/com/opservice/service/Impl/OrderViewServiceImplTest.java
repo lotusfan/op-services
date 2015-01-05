@@ -2,6 +2,7 @@ package com.opservice.service.Impl;
 
 import com.alibaba.fastjson.JSON;
 import com.opservice.service.OrderServiceIn;
+import com.opservice.service.UserServiceIn;
 import com.opservice.service.VehicleServiceIn;
 import com.yellowcar.api.op.OrderListBy;
 import com.yellowcar.api.op.OrderPriceIn;
@@ -36,6 +37,8 @@ public class OrderViewServiceImplTest {
     private SServiceServiceIn sServiceServiceIn;
     @Autowired
     private VehicleServiceIn vehicleServiceIn;
+    @Autowired
+    private UserServiceIn userServiceIn;
 /*
     @Autowired
     private OrderPriceIn orderPriceIn;
@@ -219,7 +222,7 @@ public class OrderViewServiceImplTest {
         System.out.println(orderServiceIn.getOrderPrimeItemBy(orderPrimeItem));
     }
 
-    @Test
+
     public void testInsertOrderItem() {
         OrderPrimeItem orderPrimeItem = new OrderPrimeItem();
         orderPrimeItem.setSourceId(1234567539L);
@@ -227,8 +230,10 @@ public class OrderViewServiceImplTest {
         System.out.println(orderPrimeItem.getId());
     }
 
-    public void testInsertOrderPrimeItem() {
+    @Test
+    public void testGetUserByPhone() {
 
+        System.out.println(userServiceIn.getUserByPhone("13800138001"));
     }
 
 
