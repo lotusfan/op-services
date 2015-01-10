@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.opservice.dao.VehiclePriceCalendarMapper">
+
+	<resultMap type="com.yellowcar.entities.VehiclePriceCalendar" id="vehiclePriceResultMap">
+		<id column="id" property="id" />
+		<result column="vehicle_package_id" property="vehiclePackageId" />
+		<result column="price" property="price" />
+        <result column="year" property="year" />
+		<result column="month" property="month" />
+        <result column="day" property="day" />
+		<result column="date" property="date" />
+        <result column="create_time" property="createTime" />
+		<result column="modify_time" property="modifyTime" />
+	</resultMap>
+
+
+    <!--    保存    -->
+	<insert id="save" parameterType="com.yellowcar.entities.VehiclePriceCalendar"
+		useGeneratedKeys="true" keyProperty="id">
+		insert into `vehicle_price_calendar`(
+		<trim suffixOverrides=",">
+			<if test="vehiclePackageId != null"> `vehicle_package_id` ,</if>
+			<if test="price != null"> `price` ,</if>
+            <if test="year != null"> `year` ,</if>
+			<if test="month != null"> `month` ,</if>
+            <if test="day != null"> `day` ,</if>
+            <if test="date != null"> `date` ,</if>
+			<if test="createTime != null"> `create_time` ,</if>
+			<if test="modifyTime != null"> `modify_time` ,</if>
+		</trim>
+		)values(
+		<trim suffixOverrides=",">
+			<if test="vehiclePackageId != null"> #{vehiclePackageId} ,</if>
+			<if test="price != null"> #{price} ,</if>
+            <if test="year != null"> #{year} ,</if>
+			<if test="month != null"> #{month} ,</if>
+            <if test="day != null"> #{day} ,</if>
+            <if test="date != null"> #{date} ,</if>
+			<if test="createTime != null"> #{createTime} ,</if>
+			<if test="modifyTime != null"> #{modifyTime} ,</if>
+		</trim>
+		)
+        <!--<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="id" >-->
+            <!--SELECT LAST_INSERT_ID()-->
+        <!--</selectKey>-->
+	</insert>
+
+
+    <update id="update" parameterType="com.yellowcar.entities.VehiclePriceCalendar">
+        update `vehicle_price_calendar`
+        <trim prefix="set" suffixOverrides=",">
+            <if test="vehiclePackageId != null"> `vehicle_package_id` = #{vehiclePackageId},</if>
+            <if test="price != null"> `price` = #{price},</if>
+            <if test="year != null"> `year` = #{year},</if>
+            <if test="month != null"> `month` = #{month},</if>
+            <if test="day != null"> `day` = #{day},</if>
+            <if test="date != null"> `date` = #{date},</if>
+            <if test="modifyTime != null"> `modify_time` = #{modifyTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <select id="getById" parameterType="java.lang.Long" resultMap="vehiclePriceResultMap">
+        select *
+        from `vehicle_price_calendar`
+        where `id` = #{id}
+    </select>
+
+    <select id="getBy" parameterType="com.yellowcar.entities.VehiclePriceCalendar" resultMap="vehiclePriceResultMap">
+        select *
+        from `vehicle_price_calendar`
+        where 1=1
+        <if test="vehiclePackageId != null"> and `vehicle_package_id` = #{vehiclePackageId} </if>
+        <if test="year != null"> and `year` = #{year} </if>
+        <if test="month != null"> and `month` = #{month} </if>
+        <if test="day != null"> and `day` = #{day} </if>
+        <if test="date != null"> and `date` = #{date} </if>
+    </select>
+</mapper>

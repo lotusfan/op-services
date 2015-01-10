@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.opservice.dao.UserMapper">
+
+	<resultMap type="com.yellowcar.entities.User" id="userResultMap">
+		<id column="id" property="id" />
+		<result column="name" property="name" />
+		<result column="english_name" property="englishName" />
+		<result column="phone" property="phone" />
+        <result column="local_phone" property="localPhone" />
+		<result column="weixin" property="weixin" />
+        <result column="qq" property="qq" />
+		<result column="info" property="info" />
+		<result column="create_time" property="createTime" />
+		<result column="modify_time" property="modifyTime" />
+	</resultMap>
+
+	<update id="updateUserById" parameterType="com.yellowcar.entities.User">
+		update `user`
+		<trim prefix="set" suffixOverrides=",">
+			<if test="name != null"> `name` = #{name},</if>
+			<if test="englishName != null"> `english_name` = #{englishName},</if>
+			<if test="phone != null"> phone = #{phone},</if>
+            <if test="localPhone != null"> local_phone = #{localPhone},</if>
+			<if test="weixin != null"> weixin = #{weixin},</if>
+            <if test="qq != null"> qq = #{qq},</if>
+			<if test="info != null"> info = #{info},</if>
+		</trim>
+		where id = #{id}
+	</update>
+
+	<update id="updateUserByPhoneNumber" parameterType="com.yellowcar.entities.User">
+		update `user`
+		<trim prefix="set" suffixOverrides=",">
+			<if test="name != null"> `name` = #{name},</if>
+			<if test="englishName != null"> `english_name` = #{englishName},</if>
+			<if test="phone != null"> phone = #{phone},</if>
+			<if test="localPhone != null"> local_phone = #{localPhone},</if>
+			<if test="weixin != null"> weixin = #{weixin},</if>
+			<if test="qq != null"> qq = #{qq},</if>
+			<if test="info != null"> info = #{info},</if>
+		</trim>
+		where phone = #{phone}
+	</update>
+
+	<insert id="saveUser" parameterType="com.yellowcar.entities.User"
+		useGeneratedKeys="true" keyProperty="id">
+		insert into `user`(
+		<trim suffixOverrides=",">
+			<if test="name != null"> `name` ,</if>
+			<if test="englishName != null"> english_name ,</if>
+			<if test="phone != null"> phone ,</if>
+            <if test="localPhone != null"> local_phone ,</if>
+			<if test="weixin != null"> weixin ,</if>
+            <if test="qq != null"> qq ,</if>
+			<if test="info != null"> info ,</if>
+			<if test="createTime != null"> create_time ,</if>
+		</trim>
+		)values(
+		<trim suffixOverrides=",">
+			<if test="name != null"> #{name} ,</if>
+			<if test="englishName != null"> #{englishName} ,</if>
+			<if test="phone != null"> #{phone} ,</if>
+            <if test="localPhone != null"> #{localPhone} ,</if>
+			<if test="weixin != null"> #{weixin} ,</if>
+            <if test="qq != null"> #{qq} ,</if>
+			<if test="info != null"> #{info} ,</if>
+			<if test="createTime != null"> #{createTime} ,</if>
+		</trim>
+		)
+	</insert>
+
+	<insert id="registerOnDuplicateUpdateByPhoneNumber" parameterType="com.yellowcar.entities.User"
+			useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO `user`(
+		<trim suffixOverrides=",">
+			<if test="name != null"> `name` ,</if>
+			<if test="englishName != null"> english_name ,</if>
+			<if test="phone != null"> phone ,</if>
+			<if test="localPhone != null"> local_phone ,</if>
+			<if test="weixin != null"> weixin ,</if>
+			<if test="qq != null"> qq ,</if>
+			<if test="info != null"> info ,</if>
+			<if test="createTime != null"> create_time ,</if>
+		</trim>
+		)values(
+		<trim suffixOverrides=",">
+			<if test="name != null"> #{name} ,</if>
+			<if test="englishName != null"> #{englishName} ,</if>
+			<if test="phone != null"> #{phone} ,</if>
+			<if test="localPhone != null"> #{localPhone} ,</if>
+			<if test="weixin != null"> #{weixin} ,</if>
+			<if test="qq != null"> #{qq} ,</if>
+			<if test="info != null"> #{info} ,</if>
+			<if test="createTime != null"> #{createTime} ,</if>
+		</trim>
+		) ON DUPLICATE KEY UPDATE
+		<trim suffixOverrides=",">
+			<if test="name != null"> `name` = #{name},</if>
+			<if test="englishName != null"> `english_name` = #{englishName},</if>
+			<if test="phone != null"> phone = #{phone},</if>
+			<if test="localPhone != null"> local_phone = #{localPhone},</if>
+			<if test="weixin != null"> weixin = #{weixin},</if>
+			<if test="qq != null"> qq = #{qq},</if>
+			<if test="info != null"> info = #{info},</if>
+		</trim>
+	</insert>
+	<select id="getUserById" parameterType="java.util.Map" resultMap="userResultMap">
+        select *
+        from `user`
+        where id = #{id}
+    </select>
+
+	<select id="getUserByPhoneNumber" parameterType="java.util.Map" resultMap="userResultMap">
+		SELECT *
+		FROM `user`
+		where phone = #{phone}
+	</select>
+
+</mapper>

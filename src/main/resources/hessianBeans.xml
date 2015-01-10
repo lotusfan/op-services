@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+    <bean class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+        <property name="order" value="100" />
+        <property name="urlMap">
+            <map>
+                <entry key="/orderViewService" value-ref="orderViewService" />
+                <entry key="/orderOptionService" value-ref="orderOptionalService"/>
+                <entry key="/orderPrice" value-ref="orderPrice"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean id="orderViewService" class="org.springframework.remoting.caucho.HessianServiceExporter">
+        <property name="service" ref="hessianOrderViewService" />
+        <property name="serviceInterface" value="com.yellowcar.api.op.OrderViewServiceIn" />
+    </bean>
+    <bean id="orderOptionalService" class="org.springframework.remoting.caucho.HessianServiceExporter">
+        <property name="service" ref="hessianOrderOptionalService"/>
+        <property name="serviceInterface" value="com.yellowcar.api.op.OrderOptionalServiceIn"/>
+    </bean>
+    <bean id="orderPrice" class="org.springframework.remoting.caucho.HessianServiceExporter">
+        <property name="service" ref="hessianOrderPrice"/>
+        <property name="serviceInterface" value="com.yellowcar.api.op.OrderPriceIn"/>
+    </bean>
+
+    <bean id="bigDecimalSerializerFactory" class="com.yellowcar.utils.SerializerFactory"/>
+    <bean id="hessianOrderViewService" class="com.opservice.service.Impl.OrderViewServiceImpl" />
+    <bean id="hessianOrderOptionalService" class="com.opservice.service.Impl.OrderOptionalServiceImpl"/>
+    <bean id="hessianOrderPrice" class="com.opservice.service.Impl.OrderPriceImpl"/>
+
+</beans>

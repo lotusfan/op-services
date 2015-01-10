@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.opservice.dao.VehicleMapper">
+
+<resultMap type="com.yellowcar.entities.Vehicle" id="vehicleResultMap">
+		<id column="id" property="id" />
+        <result column="pic" property="pic" />
+		<result column="title" property="title" />
+		<result column="info" property="info" />
+        <result column="facility" property="facility" />
+		<result column="capacity" property="capacity" />
+		<result column="create_time" property="createTime" />
+		<result column="modify_time" property="modifyTime" />
+	</resultMap>
+
+
+
+	<update id="update" parameterType="com.yellowcar.entities.Vehicle">
+		update `vehicle`
+		<trim prefix="set" suffixOverrides=",">
+            <if test="pic != null"> `pic` = #{pic},</if>
+			<if test="title != null"> `title` = #{title},</if>
+			<if test="info != null"> `info` = #{info},</if>
+            <if test="facility != null"> `facility` = #{facility},</if>
+			<if test="capacity != null"> `capacity` = #{capacity},</if>
+			<if test="createTime != null"> `create_time` = #{createTime},</if>
+			<if test="modifyTime != null"> `modify_time` = #{modifyTime},</if>
+		</trim>
+		where id = #{id}
+	</update>
+
+	<insert id="save" parameterType="com.yellowcar.entities.Vehicle"
+		useGeneratedKeys="true" keyProperty="id">
+		insert into `vehicle`(
+		<trim suffixOverrides=",">
+            <if test="pic != null"> `pic` ,</if>
+			<if test="title != null"> `title` ,</if>
+			<if test="info != null"> `info` ,</if>
+            <if test="facility != null"> `facility` ,</if>
+			<if test="capacity != null"> `capacity` ,</if>
+			<if test="createTime != null"> `create_time` ,</if>
+			<if test="modifyTime != null"> `modify_time` ,</if>
+		</trim>
+		)values(
+		<trim suffixOverrides=",">
+            <if test="pic != null"> #{pic} ,</if>
+			<if test="title != null"> #{title} ,</if>
+			<if test="info != null"> #{info} ,</if>
+            <if test="facility != null"> #{facility} ,</if>
+			<if test="capacity != null"> #{capacity} ,</if>
+			<if test="createTime != null"> #{createTime} ,</if>
+			<if test="modifyTime != null"> #{modifyTime} ,</if>
+		</trim>
+		)
+	</insert>
+
+
+	<select id="getById" parameterType="java.lang.Long" resultMap="vehicleResultMap">
+        select *
+        from `vehicle`
+        where `id` = #{id}
+    </select>
+
+
+    <select id="getBy" parameterType="com.yellowcar.entities.Vehicle" resultMap="vehicleResultMap">
+        select *
+        from `vehicle`
+        <trim prefix="where" prefixOverrides="AND|OR">
+            <if test="id !=null ">
+                `id` = #{id}
+            </if>
+            <if test="title != null and title != '' ">
+                AND `title` LIKE CONCAT(CONCAT('%', #{title}, '%')
+            </if>
+            <if test="capacity != null ">
+                AND `capacity` = #{capacity}
+            </if>
+        </trim>
+    </select>
+
+</mapper>

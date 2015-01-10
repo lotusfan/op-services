@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.opservice.dao.OrderGeneralViewMapper">
+
+	<resultMap type="com.yellowcar.view.OrderGeneralView" id="orderGeneralViewResultMap">
+        <result column="code" property="orderCode" />
+        <result column="use_time" property="useTime" />
+		<result column="order_status" property="orderStatus" />
+		<result column="product_title" property="productTitle" />
+        <result column="product_id" property="productId"/>
+        <result column="customer_name" property="customerName" />
+		<result column="order_source" property="orderSource" />
+        <result column="task" property="task" />
+        <result column="supplier_id" property="supplierId" />
+	</resultMap>
+
+
+    <select id="getBy" parameterType="com.yellowcar.api.op.OrderListBy" resultMap="orderGeneralViewResultMap">
+        SELECT code, use_time, product_id, od.status as order_status, product_title, customer_name, order_source, task, supplier_id from `order` od
+        LEFT JOIN order_subsidiary os on od.`code` = os.order_code
+        LEFT JOIN order_product_detail op on od.`code` = op.order_code
+        <trim prefix="where" prefixOverrides="AND|OR">
+            op.use_time between #{statime} and #{endtime} and op.vehicle_package_id > 0
+            <if test="ordersource != null and ordersource != '' ">
+                AND os.order_source like #{ordersource}
+            </if>
+            <if test="ordercode != null and ordercode != '' ">
+                AND od.code = #{ordercode}
+            </if>
+            <if test="producttitle != null and producttitle != ''">
+                AND od.product_title like #{producttitle}
+            </if>
+            <if test="orderstatus != null and orderstatus != ''">
+                AND od.status = #{orderstatus}
+            </if>
+            <if test="phone != null and phone != ''">
+                AND (od.phone = #{phone} OR os.phone_local = #{phone})
+            </if>
+            <if test="customername != null and customername != ''">
+                AND os.customer_name like #{customername}
+            </if>
+        </trim>
+    </select>
+</mapper>
