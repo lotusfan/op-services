@@ -60,11 +60,11 @@
             <if test="count != null"> `count` ,</if>
             <if test="unitPrice != null"> `unit_price` ,</if>
             <if test="unit != null"> `unit` ,</if>
+            <if test="payAmount != null"> `pay_amount` ,</if>
             <if test="useTime != null"> `use_time` ,</if>
             <if test="changePriceFlag != null"> `change_price_flag` ,</if>
             <if test="status != null"> `status` ,</if>
             <if test="remarks != null" > `remarks`, </if>
-            <if test="payAmount != null"> `pay_amount` ,</if>
 			<if test="createTime != null"> `create_time` ,</if>
 			<if test="modifyTime != null"> `modify_time`,</if>
 		</trim>

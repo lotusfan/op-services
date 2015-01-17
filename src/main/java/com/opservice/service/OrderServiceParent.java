@@ -1,8 +1,5 @@
 package com.opservice.service;
 
-import com.opservice.dao.*;
-import com.yellowcar.entities.ServicePackagePriceCalendar;
-import com.yellowcar.entities.User;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -21,4 +18,6 @@ public class OrderServiceParent {
     protected VehicleServiceIn vehicleServiceIn;
     @Autowired
     protected UserServiceIn userServiceIn;
+    @Autowired
+    protected OPRequestServiceIn oPRequestServiceIn;
 }

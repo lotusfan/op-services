@@ -26,9 +26,14 @@ import java.util.List;
 public class OrderViewServiceImpl extends OrderServiceParent implements OrderViewServiceIn {
 
     private final int ORDERSTATUS_CREATE = 0;
+    private final int PAYSTATUS = 2;
+    private final int REFUNDSTASUS = 6;
     private final String PRIMEPRICEMODIFY = "primePriceModify";
     private final String SELLPRICEMODIFY = "sellPriceModify";
+    private final String ORDERPICPREFIX = "http://192.168.199.153:8202/pic/";
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private SimpleDateFormat sdfsp = new SimpleDateFormat("yyyy-MM-dd");
+    private SimpleDateFormat sdfhm = new SimpleDateFormat("HH:mm:ss");
 
     @Override
     public OrderDetailView getOrderDetailView(String orderCode) {
@@ -39,7 +44,7 @@ public class OrderViewServiceImpl extends OrderServiceParent implements OrderVie
 
         //Order表
         Order order = orderServiceIn.getOrder(orderCode);
-        if(order == null)return null;
+        if (order == null) return null;
 
         orderDetailView.setOrderCode(order.getCode());
         orderDetailView.setChildNum(order.getChildNum() + "");
@@ -47,7 +52,11 @@ public class OrderViewServiceImpl extends OrderServiceParent implements OrderVie
         orderDetailView.setPhone(order.getPhone());
         orderDetailView.setProductId(order.getProductId() + "");
         orderDetailView.setStatus(order.getStatus() + "");
-        orderDetailView.setTripDate(order.getTripDate());
+        try {
+            orderDetailView.setTripDate(order.getTripDate());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         orderDetailView.setTripBegin(order.getTripBegin());
         orderDetailView.setProductTitle(order.getProductTitle());
         orderDetailView.setAmount(order.getAmount() + "");
@@ -77,14 +86,15 @@ public class OrderViewServiceImpl extends OrderServiceParent implements OrderVie
             orderDetailView.setReceivePlace(orderSubsidiary.getReceivePlace());
             orderDetailView.setRemind(orderSubsidiary.getRemind());
             orderDetailView.setFlightNum(orderSubsidiary.getFlightNum());
-            if (!"".equals(orderSubsidiary.getFlightTime())) {
+            if (orderSubsidiary.getFlightTime() != null) {
                 orderDetailView.setFlightTime(sdf.format(orderSubsidiary.getFlightTime()));
             }
             orderDetailView.setTripDetail(orderSubsidiary.getTripDetail());
             orderDetailView.setTripPhone(orderSubsidiary.getTripPhone());
             orderDetailView.setCustomerNamePy(orderSubsidiary.getCustomerNamePy());
             orderDetailView.setRemarksPlace(orderSubsidiary.getRemarksPlace());
-            orderDetailView.setOrderPics(orderSubsidiary.getOrderPics());
+            if (orderSubsidiary.getOrderPics() != null && orderSubsidiary.getOrderPics().length() > 0)
+                orderDetailView.setOrderPics(ORDERPICPREFIX + orderSubsidiary.getOrderPics());
             JSONArray jsonArray = JSONArray.parseArray(orderSubsidiary.getRemarksPlace());
             if (jsonArray != null && jsonArray.size() != 0) {
                 for (int i = 0; i < jsonArray.size(); i++) {
@@ -444,7 +454,7 @@ public class OrderViewServiceImpl extends OrderServiceParent implements OrderVie
             if (orderDetailView.getSourceOrderTime() != null && orderDetailView.getSourceOrderTime().length() > 0)
                 orderSubsidiary.setSourceOrderTime(new Timestamp(sdf.parse(orderDetailView.getSourceOrderTime()).getTime()));
             orderSubsidiary.setTask(orderDetailView.getTask());
-            orderSubsidiary.setOrderPics(orderDetailView.getOrderPics());
+//            orderSubsidiary.setOrderPics(ORDERPICPREFIX + orderDetailView.getOrderPics());
             orderSubsidiary.setTripDetail(orderDetailView.getTripDetail());
             orderSubsidiary.setTripPhone(orderDetailView.getTripPhone());
             orderSubsidiary.setCustomerNamePy(orderDetailView.getCustomerNamePy());
@@ -473,12 +483,16 @@ public class OrderViewServiceImpl extends OrderServiceParent implements OrderVie
                 orderProductDetail.setSupplierId(Long.parseLong(orderDetailView.getSupplierId()));
             orderProductDetail.setPathId(0L);//没有用到
             if (orderDetailView.getUseTime() != null && orderDetailView.getUseTime().length() > 0)
-                orderProductDetail.setUseTime(new Timestamp(sdf.parse(orderDetailView.getUseTime()).getTime()));
+                orderProductDetail.setUseTime(new Timestamp(sdf.parse(orderDetailView.getUseTime() + " 00:00:00").getTime()));
             if (orderDetailView.getCarStatus() != null && orderDetailView.getCarStatus().length() > 0)
                 orderProductDetail.setStatus(Integer.parseInt(orderDetailView.getCarStatus()));
             if (!"".equals(orderDetailView.getPrimePriceModify()) || !"".equals(orderDetailView.getSellPriceModify())) {
                 orderProductDetail.setChangePriceFlag(1);
             }
+            if (orderDetailView.getSellPrice() != null && orderDetailView.getSellPrice().length() > 0) {
+                orderProductDetail.setPayAmount(new BigDecimal(orderDetailView.getSellPrice()));
+            }
+
             orderProductDetail.setCreateTime(new Timestamp(System.currentTimeMillis()));
             //数据持久
             if (flag) {
@@ -508,11 +522,16 @@ public class OrderViewServiceImpl extends OrderServiceParent implements OrderVie
                 orderPDetail.setOrderCode(orderCode);
                 if (orderServiceView.getUnit() != null && orderServiceView.getUnit().length() > 0)
                     orderPDetail.setUnit(Integer.parseInt(orderServiceView.getUnit()));
-                orderPDetail.setUnitPrice(new BigDecimal(0));
                 if (orderServiceView.getSupplierId() != null && orderServiceView.getSupplierId().length() > 0)
                     orderPDetail.setSupplierId(Long.parseLong(orderServiceView.getSupplierId()));
-                if (orderServiceView.getCount() != null && orderServiceView.getCount().length() > 0)
-                    orderPDetail.setCount(Integer.parseInt(orderServiceView.getCount()));
+                if (orderServiceView.getCount() != null && orderServiceView.getCount().length() > 0) {
+                    Integer count = Integer.parseInt(orderServiceView.getCount());
+                    orderPDetail.setCount(count);
+                    if (orderServiceView.getSellPrice() != null && orderServiceView.getSellPrice().length() > 0) {
+                        orderPDetail.setPayAmount(new BigDecimal(orderServiceView.getSellPrice()).multiply(new BigDecimal(count)));
+                        orderPDetail.setUnitPrice(new BigDecimal(orderServiceView.getSellPrice()));
+                    }
+                }
                 if (orderServiceView.getServicePackageId() != null && orderServiceView.getServicePackageId().length() > 0) {
                     orderPDetail.setServicePackageId(Long.parseLong(orderServiceView.getServicePackageId()));
                 } else {
@@ -527,7 +546,7 @@ public class OrderViewServiceImpl extends OrderServiceParent implements OrderVie
                 if (orderServiceView.getStatus() != null && orderServiceView.getStatus().length() > 0)
                     orderPDetail.setStatus(Integer.parseInt(orderServiceView.getStatus()));//订单状态  （创建）
                 if (!"".equals(orderServiceView.getUseTime()))
-                    orderPDetail.setUseTime(new Timestamp(sdf.parse(orderServiceView.getUseTime()).getTime()));
+                    orderPDetail.setUseTime(new Timestamp(sdfsp.parse(orderServiceView.getUseTime()).getTime()));
                 if (!"".equals(orderServiceView.getPrimePriceModify()) || !"".equals(orderServiceView.getSellPriceModify())) {
                     orderPDetail.setChangePriceFlag(1);
                 }
@@ -537,7 +556,6 @@ public class OrderViewServiceImpl extends OrderServiceParent implements OrderVie
                 } else {
                     orderServiceIn.insertOrderProductDetail(orderPDetail);
                 }
-
 
 
                 net.sf.json.JSONObject jsons = new net.sf.json.JSONObject();
@@ -569,8 +587,17 @@ public class OrderViewServiceImpl extends OrderServiceParent implements OrderVie
                 }
             }
 
+            if(Integer.parseInt(orderDetailView.getStatus()) == PAYSTATUS){
+                //发送订单信息 快照 到PMS    OP->PMS 供应商，路线Map映射
+               oPRequestServiceIn.sendOrderTransferToPMS(orderCode);
+            }else if(Integer.parseInt(orderDetailView.getStatus()) == REFUNDSTASUS){
+                //发送联消订单号到PMS
+                oPRequestServiceIn.sendOrderCancelToPMS(orderCode);
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
 }
