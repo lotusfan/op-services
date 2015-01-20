@@ -26,8 +26,8 @@ import java.util.List;
 public class OrderViewServiceImpl extends OrderServiceParent implements OrderViewServiceIn {
 
     private final int ORDERSTATUS_CREATE = 0;
-    private final int PAYSTATUS = 2;
-    private final int REFUNDSTASUS = 6;
+    private final int PAYSTATUS = 2;            //支付状态
+    private final int REFUNDSTASUS = 6;         //拒绝状态
     private final String PRIMEPRICEMODIFY = "primePriceModify";
     private final String SELLPRICEMODIFY = "sellPriceModify";
     private final String ORDERPICPREFIX = "http://192.168.199.153:8202/pic/";
@@ -398,6 +398,35 @@ public class OrderViewServiceImpl extends OrderServiceParent implements OrderVie
             orderCode = "code_" + System.currentTimeMillis();
             flag = true;
         }
+        BigDecimal amount = new BigDecimal(0);
+
+        try {
+
+            //order_detail表 车信息
+            amount = amount.add(handleVehicle(orderDetailView, orderCode, flag));
+
+            //order_detail Service信息
+            List<OrderServiceView> list = orderDetailView.getServices();
+            for (OrderServiceView orderServiceView : list) {
+                amount = amount.add(handleService(orderServiceView, orderCode));
+            }
+            //订单和订单附属表
+            handleOrderAndOrderSubsidiary(orderDetailView, orderCode, amount, flag);
+
+           /* if (Integer.parseInt(orderDetailView.getStatus()) == PAYSTATUS) {
+                //发送订单信息 快照 到PMS    OP->PMS 供应商，路线Map映射
+                oPRequestServiceIn.sendOrderTransferToPMS(orderCode);
+            } else if (Integer.parseInt(orderDetailView.getStatus()) == REFUNDSTASUS) {
+                //发送联消订单号到PMS
+                oPRequestServiceIn.sendOrderCancelToPMS(orderCode);
+            }*/
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public String handleOrderAndOrderSubsidiary(OrderDetailView orderDetailView, String orderCode, BigDecimal amount, boolean flag) {
 
         try {
             //order表
@@ -422,9 +451,9 @@ public class OrderViewServiceImpl extends OrderServiceParent implements OrderVie
 
             order.setTripDate(orderDetailView.getTripDate());
             if (orderDetailView.getAmount() != null && orderDetailView.getAmount().length() > 0) {
-                order.setAmount(new BigDecimal(orderDetailView.getAmount()));//订单总金额
-                order.setPayAmount(order.getAmount());//支付总金额
-                order.setFinalAmount(order.getAmount());
+                order.setAmount(amount);//订单总金额 后台计算
+                order.setPayAmount(new BigDecimal(orderDetailView.getAmount()));//支付总金额
+                order.setFinalAmount(new BigDecimal(orderDetailView.getAmount()));
             }
             order.setTripBegin(orderDetailView.getTripBegin());
             order.setRemarks(orderDetailView.getRemarks());
@@ -464,140 +493,164 @@ public class OrderViewServiceImpl extends OrderServiceParent implements OrderVie
             } else {
                 orderServiceIn.insertOrderSubsidiary(orderSubsidiary);
             }
-
-            //order_detail表 车信息
-            OrderProductDetail orderProductDetail = new OrderProductDetail();
-
-            if (orderDetailView.getOrderProductDetailId() != null && orderDetailView.getOrderProductDetailId().length() != 0)
-                orderProductDetail.setId(Long.parseLong(orderDetailView.getOrderProductDetailId()));
-            orderProductDetail.setOrderCode(orderCode);
-            if (orderDetailView.getVehiclePackageId() != null && orderDetailView.getVehiclePackageId().length() > 0) {
-                orderProductDetail.setVehiclePackageId(Long.parseLong(orderDetailView.getVehiclePackageId()));
-            } else {
-                orderProductDetail.setVehiclePackageId(1L);
-            }
-            orderProductDetail.setServiceId(0L);
-            orderProductDetail.setServicePackageId(0L);
-            orderProductDetail.setCount(1);
-            if (orderDetailView.getSupplierId() != null && orderDetailView.getSupplierId().length() > 0)
-                orderProductDetail.setSupplierId(Long.parseLong(orderDetailView.getSupplierId()));
-            orderProductDetail.setPathId(0L);//没有用到
-            if (orderDetailView.getUseTime() != null && orderDetailView.getUseTime().length() > 0)
-                orderProductDetail.setUseTime(new Timestamp(sdf.parse(orderDetailView.getUseTime() + " 00:00:00").getTime()));
-            if (orderDetailView.getCarStatus() != null && orderDetailView.getCarStatus().length() > 0)
-                orderProductDetail.setStatus(Integer.parseInt(orderDetailView.getCarStatus()));
-            if (!"".equals(orderDetailView.getPrimePriceModify()) || !"".equals(orderDetailView.getSellPriceModify())) {
-                orderProductDetail.setChangePriceFlag(1);
-            }
-            if (orderDetailView.getSellPrice() != null && orderDetailView.getSellPrice().length() > 0) {
-                orderProductDetail.setPayAmount(new BigDecimal(orderDetailView.getSellPrice()));
-            }
-
-            orderProductDetail.setCreateTime(new Timestamp(System.currentTimeMillis()));
+            //order日志
+            orderServiceIn.insertOrderOperation(order);
             //数据持久
             if (flag) {
                 orderServiceIn.insertOrder(order);
-                orderServiceIn.insertOrderProductDetail(orderProductDetail);
             } else {
                 orderServiceIn.updateOById(order);
-                orderServiceIn.updateOrderProductDetail(orderProductDetail);
             }
-
-            //存放价格调整值
-            net.sf.json.JSONArray jsonArray = new net.sf.json.JSONArray();
-            net.sf.json.JSONObject jsonp = new net.sf.json.JSONObject();
-            jsonp.accumulate(PRIMEPRICEMODIFY, orderDetailView.getPrimePriceModify() + "");
-            jsonp.accumulate(SELLPRICEMODIFY, orderDetailView.getSellPriceModify() + "");
-            jsonArray.add(jsonp);
-
-            opdlist.add(orderProductDetail);
-
-            //order_detail Service信息
-            List<OrderServiceView> list = orderDetailView.getServices();
-
-            for (OrderServiceView orderServiceView : list) {
-                OrderProductDetail orderPDetail = new OrderProductDetail();
-                if (orderServiceView.getOrderProductDetailId() != null && orderServiceView.getOrderProductDetailId().length() != 0)
-                    orderPDetail.setId(Long.parseLong(orderServiceView.getOrderProductDetailId()));
-                orderPDetail.setOrderCode(orderCode);
-                if (orderServiceView.getUnit() != null && orderServiceView.getUnit().length() > 0)
-                    orderPDetail.setUnit(Integer.parseInt(orderServiceView.getUnit()));
-                if (orderServiceView.getSupplierId() != null && orderServiceView.getSupplierId().length() > 0)
-                    orderPDetail.setSupplierId(Long.parseLong(orderServiceView.getSupplierId()));
-                if (orderServiceView.getCount() != null && orderServiceView.getCount().length() > 0) {
-                    Integer count = Integer.parseInt(orderServiceView.getCount());
-                    orderPDetail.setCount(count);
-                    if (orderServiceView.getSellPrice() != null && orderServiceView.getSellPrice().length() > 0) {
-                        orderPDetail.setPayAmount(new BigDecimal(orderServiceView.getSellPrice()).multiply(new BigDecimal(count)));
-                        orderPDetail.setUnitPrice(new BigDecimal(orderServiceView.getSellPrice()));
-                    }
-                }
-                if (orderServiceView.getServicePackageId() != null && orderServiceView.getServicePackageId().length() > 0) {
-                    orderPDetail.setServicePackageId(Long.parseLong(orderServiceView.getServicePackageId()));
-                } else {
-                    orderPDetail.setServicePackageId(10000L);
-                }
-                if (orderServiceView.getServiceId() != null && orderServiceView.getServiceId().length() > 0) {
-                    orderPDetail.setServiceId(Long.parseLong(orderServiceView.getServiceId()));
-                } else {
-                    orderPDetail.setServiceId(10000L);
-                }
-                orderPDetail.setRemarks(orderServiceView.getRemarks());
-                if (orderServiceView.getStatus() != null && orderServiceView.getStatus().length() > 0)
-                    orderPDetail.setStatus(Integer.parseInt(orderServiceView.getStatus()));//订单状态  （创建）
-                if (!"".equals(orderServiceView.getUseTime()))
-                    orderPDetail.setUseTime(new Timestamp(sdfsp.parse(orderServiceView.getUseTime()).getTime()));
-                if (!"".equals(orderServiceView.getPrimePriceModify()) || !"".equals(orderServiceView.getSellPriceModify())) {
-                    orderPDetail.setChangePriceFlag(1);
-                }
-                orderPDetail.setCreateTime(new Timestamp(System.currentTimeMillis()));
-                if (orderServiceView.getOrderProductDetailId() != null && orderServiceView.getOrderProductDetailId().length() > 0) {
-                    orderServiceIn.updateOrderProductDetail(orderPDetail);
-                } else {
-                    orderServiceIn.insertOrderProductDetail(orderPDetail);
-                }
-
-
-                net.sf.json.JSONObject jsons = new net.sf.json.JSONObject();
-                jsons.accumulate(PRIMEPRICEMODIFY, orderServiceView.getPrimePriceModify() + "");
-                jsons.accumulate(SELLPRICEMODIFY, orderServiceView.getSellPriceModify() + "");
-                jsonArray.add(jsons);
-
-                opdlist.add(orderPDetail);
-            }
-
-
-            for (int i = 0; i < opdlist.size(); i++) {
-                net.sf.json.JSONObject json = jsonArray.getJSONObject(i);
-                if (json.getString(PRIMEPRICEMODIFY) != null && json.getString(PRIMEPRICEMODIFY).length() > 0) {
-                    OrderPrimeItem orderPrimeItem = new OrderPrimeItem();
-                    orderPrimeItem.setOrderCode(orderCode);
-                    orderPrimeItem.setSourceId(opdlist.get(i).getId());
-                    orderPrimeItem.setAmount(new BigDecimal(json.getString(PRIMEPRICEMODIFY)));
-                    orderPrimeItem.setCreateTime(new Timestamp(System.currentTimeMillis()));
-                    orderServiceIn.insertOrUpdateOrderPrimeItem(orderPrimeItem);
-                }
-                if (json.getString(SELLPRICEMODIFY) != null && json.getString(SELLPRICEMODIFY).length() > 0) {
-                    OrderItem orderItem = new OrderItem();
-                    orderItem.setOrderCode(orderCode);
-                    orderItem.setSourceId(opdlist.get(i).getId());
-                    orderItem.setAmount(new BigDecimal(json.getString(SELLPRICEMODIFY)));
-                    orderItem.setCreateTime(new Timestamp(System.currentTimeMillis()));
-                    orderServiceIn.insertOrUpdateOrderItem(orderItem);
-                }
-            }
-
-            if(Integer.parseInt(orderDetailView.getStatus()) == PAYSTATUS){
-                //发送订单信息 快照 到PMS    OP->PMS 供应商，路线Map映射
-               oPRequestServiceIn.sendOrderTransferToPMS(orderCode);
-            }else if(Integer.parseInt(orderDetailView.getStatus()) == REFUNDSTASUS){
-                //发送联消订单号到PMS
-                oPRequestServiceIn.sendOrderCancelToPMS(orderCode);
-            }
-
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return orderCode;
+    }
+
+    public BigDecimal handleVehicle(OrderDetailView orderDetailView, String orderCode, boolean flag) throws Exception {
+        //order_detail表 车信息
+        OrderProductDetail orderProductDetail = new OrderProductDetail();
+        BigDecimal amount = new BigDecimal(0);
+
+        if (orderDetailView.getOrderProductDetailId() != null && orderDetailView.getOrderProductDetailId().length() != 0)
+            orderProductDetail.setId(Long.parseLong(orderDetailView.getOrderProductDetailId()));
+        orderProductDetail.setOrderCode(orderCode);
+        if (orderDetailView.getVehiclePackageId() != null && orderDetailView.getVehiclePackageId().length() > 0) {
+            orderProductDetail.setVehiclePackageId(Long.parseLong(orderDetailView.getVehiclePackageId()));
+        } else {
+            orderProductDetail.setVehiclePackageId(1L);
+        }
+        orderProductDetail.setServiceId(0L);
+        orderProductDetail.setServicePackageId(0L);
+        orderProductDetail.setCount(1);
+        if (orderDetailView.getSupplierId() != null && orderDetailView.getSupplierId().length() > 0)
+            orderProductDetail.setSupplierId(Long.parseLong(orderDetailView.getSupplierId()));
+        orderProductDetail.setPathId(0L);//没有用到
+        if (orderDetailView.getCarStatus() != null && orderDetailView.getCarStatus().length() > 0) {
+            orderProductDetail.setStatus(Integer.parseInt(orderDetailView.getCarStatus()));
+        }
+        if (!"".equals(orderDetailView.getPrimePriceModify()) || !"".equals(orderDetailView.getSellPriceModify())) {
+            orderProductDetail.setChangePriceFlag(1);
+        }
+        orderProductDetail.setCreateTime(new Timestamp(System.currentTimeMillis()));
+        String useTimeStr = orderDetailView.getUseTime();
+        if (useTimeStr != null && useTimeStr.length() > 0) {
+//            SimpleDateFormat simpleDateFormat = new SimpleDateFormat();
+            Timestamp useTime = new Timestamp(sdf.parse(useTimeStr).getTime());
+            orderProductDetail.setUseTime(useTime);
+            //价格查询
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(useTime);
+            if (orderDetailView.getVehiclePackageId() != null && orderDetailView.getVehiclePackageId().length() > 0) {
+                VehiclePriceCalendar vehiclePriceCalendar = vehicleServiceIn.getVehiclePriceCalendar(orderProductDetail.getVehiclePackageId(),
+                        calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DATE));
+                if (vehiclePriceCalendar != null){
+                    if(orderDetailView.getSellPriceModify() != null && orderDetailView.getSellPriceModify().length() > 0) {
+                        amount = vehiclePriceCalendar.getPrice().add(new BigDecimal(orderDetailView.getSellPriceModify()));
+                        amount = amount.multiply(new BigDecimal(orderProductDetail.getCount()));
+                    }else {
+                        amount = vehiclePriceCalendar.getPrice().multiply(new BigDecimal(orderProductDetail.getCount()));
+                    }
+                }
+                orderProductDetail.setPayAmount(amount);
+            }
+        }
+        //数据持久
+        if (flag) {
+            orderServiceIn.insertOrderProductDetail(orderProductDetail);
+        } else {
+            orderServiceIn.updateOrderProductDetail(orderProductDetail);
+        }
+        handleItem(orderDetailView.getPrimePriceModify(), orderDetailView.getSellPriceModify(), orderProductDetail);
+        return amount;
+    }
+
+    public BigDecimal handleService(OrderServiceView orderServiceView, String orderCode) throws Exception {
+
+        OrderProductDetail orderPDetail = new OrderProductDetail();
+        BigDecimal amount = new BigDecimal(0);
+
+        if (orderServiceView.getOrderProductDetailId() != null && orderServiceView.getOrderProductDetailId().length() != 0)
+            orderPDetail.setId(Long.parseLong(orderServiceView.getOrderProductDetailId()));
+        orderPDetail.setOrderCode(orderCode);
+        if (orderServiceView.getUnit() != null && orderServiceView.getUnit().length() > 0)
+            orderPDetail.setUnit(Integer.parseInt(orderServiceView.getUnit()));
+        if (orderServiceView.getSupplierId() != null && orderServiceView.getSupplierId().length() > 0)
+            orderPDetail.setSupplierId(Long.parseLong(orderServiceView.getSupplierId()));
+        if (orderServiceView.getCount() != null && orderServiceView.getCount().length() > 0) {
+            Integer count = Integer.parseInt(orderServiceView.getCount());
+            orderPDetail.setCount(count);
+        }else {
+            orderPDetail.setCount(1);
+        }
+        if (orderServiceView.getServicePackageId() != null && orderServiceView.getServicePackageId().length() > 0) {
+            orderPDetail.setServicePackageId(Long.parseLong(orderServiceView.getServicePackageId()));
+        } else {
+            orderPDetail.setServicePackageId(10000L);
+        }
+        if (orderServiceView.getServiceId() != null && orderServiceView.getServiceId().length() > 0) {
+            orderPDetail.setServiceId(Long.parseLong(orderServiceView.getServiceId()));
+        } else {
+            orderPDetail.setServiceId(10000L);
+        }
+        orderPDetail.setRemarks(orderServiceView.getRemarks());
+        if (orderServiceView.getStatus() != null && orderServiceView.getStatus().length() > 0)
+            orderPDetail.setStatus(Integer.parseInt(orderServiceView.getStatus()));//订单状态  （创建）
+
+        String useTimeStr = orderServiceView.getUseTime();
+        if (useTimeStr != null && useTimeStr.length() > 0) {
+//            SimpleDateFormat simpleDateFormat = new SimpleDateFormat();
+            Timestamp useTime = new Timestamp(sdf.parse(useTimeStr).getTime());
+            orderPDetail.setUseTime(useTime);
+            //价格查询
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(useTime);
+            if (orderServiceView.getServicePackageId() != null && orderServiceView.getServicePackageId().length() > 0) {
+                ServicePackagePriceCalendar servicePackagePriceCalendar = sServiceServiceIn.getServicePPCalendarBy(orderPDetail.getServicePackageId(),
+                        calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DATE));
+                if (servicePackagePriceCalendar != null){
+                    orderPDetail.setUnitPrice(servicePackagePriceCalendar.getPrice());
+                    if(orderServiceView.getSellPriceModify() != null && orderServiceView.getSellPrice().length() > 0) {
+                        amount = servicePackagePriceCalendar.getPrice().add(new BigDecimal(orderServiceView.getSellPriceModify()));
+                        amount = amount.multiply(new BigDecimal(orderServiceView.getCount()));
+                    }else {
+                        amount = servicePackagePriceCalendar.getPrice().multiply(new BigDecimal(orderServiceView.getCount()));
+                    }
+                    orderPDetail.setPayAmount(amount);
+                }
+            }
+        }
+        if (!"".equals(orderServiceView.getPrimePriceModify()) || !"".equals(orderServiceView.getSellPriceModify())) {
+            orderPDetail.setChangePriceFlag(1);
+        }
+        orderPDetail.setCreateTime(new Timestamp(System.currentTimeMillis()));
+        if (orderServiceView.getOrderProductDetailId() != null && orderServiceView.getOrderProductDetailId().length() > 0) {
+            orderServiceIn.updateOrderProductDetail(orderPDetail);
+        } else {
+            orderServiceIn.insertOrderProductDetail(orderPDetail);
+        }
+        handleItem(orderServiceView.getPrimePriceModify(), orderServiceView.getSellPriceModify(), orderPDetail);
+        return amount;
+    }
+
+    public void handleItem(String primePriceModify, String sellPriceModify, OrderProductDetail orderProductDetail) {
+        if (primePriceModify != null && primePriceModify.length() > 0) {
+            OrderPrimeItem orderPrimeItem = new OrderPrimeItem();
+            orderPrimeItem.setOrderCode(orderProductDetail.getOrderCode());
+            orderPrimeItem.setSourceId(orderProductDetail.getId());
+            orderPrimeItem.setAmount(new BigDecimal(primePriceModify));
+            orderPrimeItem.setCreateTime(new Timestamp(System.currentTimeMillis()));
+            orderServiceIn.insertOrUpdateOrderPrimeItem(orderPrimeItem);
+        }
+        if (sellPriceModify != null && sellPriceModify.length() > 0) {
+            OrderItem orderItem = new OrderItem();
+            orderItem.setOrderCode(orderProductDetail.getOrderCode());
+            orderItem.setSourceId(orderProductDetail.getId());
+            orderItem.setAmount(new BigDecimal(sellPriceModify));
+            orderItem.setCreateTime(new Timestamp(System.currentTimeMillis()));
+            orderServiceIn.insertOrUpdateOrderItem(orderItem);
+        }
+
     }
 
 }
