@@ -452,7 +452,7 @@ public class OrderViewServiceImpl extends OrderServiceParent implements OrderVie
             if (orderDetailView.getDayNum() != null && orderDetailView.getDayNum().length() > 0)
                 order.setDayNum(Integer.parseInt(orderDetailView.getDayNum()));
 
-            order.setTripDate(orderDetailView.getTripDate());
+            order.setTripDate(orderDetailView.getUseTime());
             if (orderDetailView.getAmount() != null) {
                 order.setAmount(amount);//订单总金额 后台计算
                 order.setPayAmount(orderDetailView.getAmount());//支付总金额
