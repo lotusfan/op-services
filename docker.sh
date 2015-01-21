@@ -1,5 +1,5 @@
 #!/bin/bash
-port=8184
+port=7500
 
 pwd=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd -P)
 name=$(basename $pwd)
