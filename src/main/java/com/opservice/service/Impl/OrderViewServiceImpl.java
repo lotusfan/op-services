@@ -285,6 +285,8 @@ public class OrderViewServiceImpl extends OrderServiceParent implements OrderVie
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        }else {
+            orderListBy.setEndtime(orderListBy.getEndtime()+" 23:59:59");
         }
 
         if (orderListBy.getCustomername() != null && orderListBy.getCustomername().length() > 0) {
