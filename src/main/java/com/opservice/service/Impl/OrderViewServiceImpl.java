@@ -26,8 +26,8 @@ import java.util.List;
 public class OrderViewServiceImpl extends OrderServiceParent implements OrderViewServiceIn {
 
     private final int ORDERSTATUS_CREATE = 0;
-    private final int PAYSTATUS = 2;            //支付状态
-    private final int REFUNDSTASUS = 6;         //拒绝状态
+    private final int PAY_STATUS = 2;            //支付状态
+    private final int REFUND_STASUS = 6;         //拒绝状态
     private final String PRIMEPRICEMODIFY = "primePriceModify";
     private final String SELLPRICEMODIFY = "sellPriceModify";
     private final String ORDERPICPREFIX = "http://192.168.199.153:8202/pic/";
@@ -285,8 +285,8 @@ public class OrderViewServiceImpl extends OrderServiceParent implements OrderVie
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }else {
-            orderListBy.setEndtime(orderListBy.getEndtime()+" 23:59:59");
+        } else {
+            orderListBy.setEndtime(orderListBy.getEndtime() + " 23:59:59");
         }
 
         if (orderListBy.getCustomername() != null && orderListBy.getCustomername().length() > 0) {
@@ -430,7 +430,6 @@ public class OrderViewServiceImpl extends OrderServiceParent implements OrderVie
 
     public String handleOrderAndOrderSubsidiary(OrderDetailView orderDetailView, String orderCode, BigDecimal amount, boolean flag) {
 
-        System.out.println("-------------"+orderDetailView);
         try {
             //order表
             Order order = new Order();
@@ -460,11 +459,13 @@ public class OrderViewServiceImpl extends OrderServiceParent implements OrderVie
             }
             order.setTripBegin(orderDetailView.getTripBegin());
             order.setRemarks(orderDetailView.getRemarks());
-            if (orderDetailView.getSourceOrderTime() != null && orderDetailView.getSourceOrderTime().length() > 0)
+            if (orderDetailView.getSourceOrderTime() != null && orderDetailView.getSourceOrderTime().length() > 0){
                 order.setPayTime(new Timestamp(sdf.parse(orderDetailView.getSourceOrderTime()).getTime())); //支付时间--下单时间
+            }else {
+                order.setPayTime(new Timestamp(sdf.parse("0000-00-00 00:00:00").getTime())); //默认时间
+            }
             order.setStatus(orderDetailView.getStatus());//订单状态（创建）
             order.setCreateTime(new Timestamp(System.currentTimeMillis()));
-
 
             //order_subsidiary表
             OrderSubsidiary orderSubsidiary = new OrderSubsidiary();
@@ -474,16 +475,22 @@ public class OrderViewServiceImpl extends OrderServiceParent implements OrderVie
             orderSubsidiary.setCustomerEmail(orderDetailView.getCustomerEmail());
             orderSubsidiary.setCustomerName(orderDetailView.getCustomerName());
             orderSubsidiary.setFlightNum(orderDetailView.getFlightNum());
-            if (orderDetailView.getFlightTime() != null && orderDetailView.getFlightTime().length() > 0)
+            if (orderDetailView.getFlightTime() != null && orderDetailView.getFlightTime().length() > 0){
                 orderSubsidiary.setFlightTime(new Timestamp(sdf.parse(orderDetailView.getFlightTime()).getTime()));
+            }else {
+                orderSubsidiary.setFlightTime(new Timestamp(0L));
+            }
             orderSubsidiary.setOrderSource(orderDetailView.getOrderSource());
             orderSubsidiary.setOutId(orderDetailView.getOutId());
             orderSubsidiary.setPhoneLocal(orderDetailView.getPhoneLocal());
             orderSubsidiary.setReceivePlace(orderDetailView.getReceivePlace());
             orderSubsidiary.setRemarksPlace(orderDetailView.getRemarksPlace());//地点json
             orderSubsidiary.setRemind(orderDetailView.getRemind());
-            if (orderDetailView.getSourceOrderTime() != null && orderDetailView.getSourceOrderTime().length() > 0)
+            if (orderDetailView.getSourceOrderTime() != null && orderDetailView.getSourceOrderTime().length() > 0){
                 orderSubsidiary.setSourceOrderTime(new Timestamp(sdf.parse(orderDetailView.getSourceOrderTime()).getTime()));
+            }else {
+                orderSubsidiary.setSourceOrderTime(new Timestamp(0L));
+            }
             orderSubsidiary.setTask(orderDetailView.getTask());
 //            orderSubsidiary.setOrderPics(ORDERPICPREFIX + orderDetailView.getOrderPics());
             orderSubsidiary.setTripDetail(orderDetailView.getTripDetail());
@@ -554,6 +561,8 @@ public class OrderViewServiceImpl extends OrderServiceParent implements OrderVie
                 }
                 orderProductDetail.setPayAmount(amount);
             }
+        }else {
+            orderProductDetail.setUseTime(new Timestamp(0L));
         }
         //数据持久
         if (flag) {
@@ -653,4 +662,8 @@ public class OrderViewServiceImpl extends OrderServiceParent implements OrderVie
 
     }
 
+    @Override
+    public void changeOrderStatus() {
+
+    }
 }
