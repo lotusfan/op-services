@@ -51,7 +51,7 @@ public class OrderViewServiceImpl extends OrderServiceParent implements OrderVie
         orderDetailView.setPersonNum(order.getPersonNum() + "");
         orderDetailView.setPhone(order.getPhone());
         orderDetailView.setProductId(order.getProductId() + "");
-        orderDetailView.setStatus(order.getStatus() + "");
+        orderDetailView.setStatus(order.getStatus());
         try {
             orderDetailView.setTripDate(order.getTripDate());
         } catch (Exception e) {
@@ -59,7 +59,7 @@ public class OrderViewServiceImpl extends OrderServiceParent implements OrderVie
         }
         orderDetailView.setTripBegin(order.getTripBegin());
         orderDetailView.setProductTitle(order.getProductTitle());
-        orderDetailView.setAmount(order.getAmount() + "");
+        orderDetailView.setAmount(order.getAmount());
         orderDetailView.setRemarks(order.getRemarks() + "");
         orderDetailView.setUserId(order.getUserId() + "");
         orderDetailView.setDayNum(order.getDayNum() + "");
@@ -131,7 +131,7 @@ public class OrderViewServiceImpl extends OrderServiceParent implements OrderVie
                 if (supplier != null)
                     orderDetailView.setSupplierName(supplier.getName());
 
-                orderDetailView.setCarStatus(orderProductDetail.getStatus() + "");
+                orderDetailView.setCarStatus(orderProductDetail.getStatus());
 
                 VehiclePackage vehiclePackage = vehicleServiceIn.getVehiclePackage(Long.parseLong(orderDetailView.getVehiclePackageId()));
                 orderDetailView.setVehiclePackageDesc(vehiclePackage.getDesc());
@@ -428,6 +428,7 @@ public class OrderViewServiceImpl extends OrderServiceParent implements OrderVie
 
     public String handleOrderAndOrderSubsidiary(OrderDetailView orderDetailView, String orderCode, BigDecimal amount, boolean flag) {
 
+        System.out.println("-------------"+orderDetailView);
         try {
             //order表
             Order order = new Order();
@@ -450,17 +451,16 @@ public class OrderViewServiceImpl extends OrderServiceParent implements OrderVie
                 order.setDayNum(Integer.parseInt(orderDetailView.getDayNum()));
 
             order.setTripDate(orderDetailView.getTripDate());
-            if (orderDetailView.getAmount() != null && orderDetailView.getAmount().length() > 0) {
+            if (orderDetailView.getAmount() != null) {
                 order.setAmount(amount);//订单总金额 后台计算
-                order.setPayAmount(new BigDecimal(orderDetailView.getAmount()));//支付总金额
-                order.setFinalAmount(new BigDecimal(orderDetailView.getAmount()));
+                order.setPayAmount(orderDetailView.getAmount());//支付总金额
+                order.setFinalAmount(orderDetailView.getAmount());
             }
             order.setTripBegin(orderDetailView.getTripBegin());
             order.setRemarks(orderDetailView.getRemarks());
             if (orderDetailView.getSourceOrderTime() != null && orderDetailView.getSourceOrderTime().length() > 0)
                 order.setPayTime(new Timestamp(sdf.parse(orderDetailView.getSourceOrderTime()).getTime())); //支付时间--下单时间
-            if (orderDetailView.getStatus() != null && orderDetailView.getStatus().length() > 0)
-                order.setStatus(Integer.parseInt(orderDetailView.getStatus()));//订单状态（创建）
+            order.setStatus(orderDetailView.getStatus());//订单状态（创建）
             order.setCreateTime(new Timestamp(System.currentTimeMillis()));
 
 
@@ -526,9 +526,7 @@ public class OrderViewServiceImpl extends OrderServiceParent implements OrderVie
         if (orderDetailView.getSupplierId() != null && orderDetailView.getSupplierId().length() > 0)
             orderProductDetail.setSupplierId(Long.parseLong(orderDetailView.getSupplierId()));
         orderProductDetail.setPathId(0L);//没有用到
-        if (orderDetailView.getCarStatus() != null && orderDetailView.getCarStatus().length() > 0) {
-            orderProductDetail.setStatus(Integer.parseInt(orderDetailView.getCarStatus()));
-        }
+        orderProductDetail.setStatus(orderDetailView.getCarStatus());
         if (!"".equals(orderDetailView.getPrimePriceModify()) || !"".equals(orderDetailView.getSellPriceModify())) {
             orderProductDetail.setChangePriceFlag(1);
         }
@@ -544,11 +542,11 @@ public class OrderViewServiceImpl extends OrderServiceParent implements OrderVie
             if (orderDetailView.getVehiclePackageId() != null && orderDetailView.getVehiclePackageId().length() > 0) {
                 VehiclePriceCalendar vehiclePriceCalendar = vehicleServiceIn.getVehiclePriceCalendar(orderProductDetail.getVehiclePackageId(),
                         calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DATE));
-                if (vehiclePriceCalendar != null){
-                    if(orderDetailView.getSellPriceModify() != null && orderDetailView.getSellPriceModify().length() > 0) {
+                if (vehiclePriceCalendar != null) {
+                    if (orderDetailView.getSellPriceModify() != null && orderDetailView.getSellPriceModify().length() > 0) {
                         amount = vehiclePriceCalendar.getPrice().add(new BigDecimal(orderDetailView.getSellPriceModify()));
                         amount = amount.multiply(new BigDecimal(orderProductDetail.getCount()));
-                    }else {
+                    } else {
                         amount = vehiclePriceCalendar.getPrice().multiply(new BigDecimal(orderProductDetail.getCount()));
                     }
                 }
@@ -580,7 +578,7 @@ public class OrderViewServiceImpl extends OrderServiceParent implements OrderVie
         if (orderServiceView.getCount() != null && orderServiceView.getCount().length() > 0) {
             Integer count = Integer.parseInt(orderServiceView.getCount());
             orderPDetail.setCount(count);
-        }else {
+        } else {
             orderPDetail.setCount(1);
         }
         if (orderServiceView.getServicePackageId() != null && orderServiceView.getServicePackageId().length() > 0) {
@@ -608,12 +606,12 @@ public class OrderViewServiceImpl extends OrderServiceParent implements OrderVie
             if (orderServiceView.getServicePackageId() != null && orderServiceView.getServicePackageId().length() > 0) {
                 ServicePackagePriceCalendar servicePackagePriceCalendar = sServiceServiceIn.getServicePPCalendarBy(orderPDetail.getServicePackageId(),
                         calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DATE));
-                if (servicePackagePriceCalendar != null){
+                if (servicePackagePriceCalendar != null) {
                     orderPDetail.setUnitPrice(servicePackagePriceCalendar.getPrice());
-                    if(orderServiceView.getSellPriceModify() != null && orderServiceView.getSellPrice().length() > 0) {
+                    if (orderServiceView.getSellPriceModify() != null && orderServiceView.getSellPriceModify().length() > 0) {
                         amount = servicePackagePriceCalendar.getPrice().add(new BigDecimal(orderServiceView.getSellPriceModify()));
                         amount = amount.multiply(new BigDecimal(orderServiceView.getCount()));
-                    }else {
+                    } else {
                         amount = servicePackagePriceCalendar.getPrice().multiply(new BigDecimal(orderServiceView.getCount()));
                     }
                     orderPDetail.setPayAmount(amount);

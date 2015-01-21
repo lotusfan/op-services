@@ -230,10 +230,17 @@ public class OrderViewServiceImplTest {
         System.out.println(orderPrimeItem.getId());
     }
 
-    @Test
+
     public void testGetUserByPhone() {
 
         System.out.println(userServiceIn.getUserByPhone("13800138001"));
+    }
+
+    @Test
+    public void testInsertOrderOperation() {
+        OrderOperation orderOperation = new OrderOperation();
+        orderOperation.setOrderCode("1234567789");
+        orderServiceIn.insertOrderOperation(orderOperation);
     }
 
 

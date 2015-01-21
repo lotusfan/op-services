@@ -17,14 +17,20 @@
     <bean id="orderViewService" class="org.springframework.remoting.caucho.HessianServiceExporter">
         <property name="service" ref="hessianOrderViewService" />
         <property name="serviceInterface" value="com.yellowcar.api.op.OrderViewServiceIn" />
+        <property name="serializerFactory" ref="bigDecimalSerializerFactory"/>
+
     </bean>
     <bean id="orderOptionalService" class="org.springframework.remoting.caucho.HessianServiceExporter">
         <property name="service" ref="hessianOrderOptionalService"/>
         <property name="serviceInterface" value="com.yellowcar.api.op.OrderOptionalServiceIn"/>
+        <property name="serializerFactory" ref="bigDecimalSerializerFactory"/>
+
     </bean>
     <bean id="orderPrice" class="org.springframework.remoting.caucho.HessianServiceExporter">
         <property name="service" ref="hessianOrderPrice"/>
         <property name="serviceInterface" value="com.yellowcar.api.op.OrderPriceIn"/>
+        <property name="serializerFactory" ref="bigDecimalSerializerFactory"/>
+
     </bean>
 
     <bean id="bigDecimalSerializerFactory" class="com.yellowcar.utils.SerializerFactory"/>

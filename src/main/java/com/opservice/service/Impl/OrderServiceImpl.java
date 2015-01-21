@@ -8,7 +8,9 @@ import com.yellowcar.view.OrderGeneralView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by zhangfan on 2014/12/11.
@@ -28,6 +30,22 @@ public class OrderServiceImpl implements OrderServiceIn {
     private OrderPrimeItemMapper orderPrimeItemMapper;
     @Autowired
     private OrderGeneralViewMapper orderGeneralViewMapper;
+    @Autowired
+    private OrderOperationMapper orderOperationMapper;
+
+    public static Map STATUSTOACTION = new HashMap<>();
+
+    static {
+        STATUSTOACTION.put(0, 1);
+        STATUSTOACTION.put(1, 1);
+        STATUSTOACTION.put(2, 2);
+        STATUSTOACTION.put(3, 2);
+        STATUSTOACTION.put(9, 5);
+        STATUSTOACTION.put(8, 6);
+        STATUSTOACTION.put(5, 3);
+        STATUSTOACTION.put(7, 6);
+    }
+
 
     @Override
     public List<Order> getOrderList() {
@@ -41,7 +59,7 @@ public class OrderServiceImpl implements OrderServiceIn {
         orderProductDetail.setOrderCode(orderCode);
         orderProductDetail.setServicePackageId(0L);
         List<OrderProductDetail> list = orderProductDetailMapper.getBy(orderProductDetail);
-        return   (list != null && list.size() == 1)?list.get(0):null;
+        return (list != null && list.size() == 1) ? list.get(0) : null;
     }
 
     @Override
@@ -50,7 +68,7 @@ public class OrderServiceImpl implements OrderServiceIn {
         Order order = new Order();
         order.setCode(orderCode);
         List<Order> list = orderMapper.getBy(order);
-        return (list != null && list.size() > 0) ? list.get(0):null;
+        return (list != null && list.size() > 0) ? list.get(0) : null;
     }
 
     @Override
@@ -146,7 +164,7 @@ public class OrderServiceImpl implements OrderServiceIn {
     @Override
     public List<OrderProductDetail> getOrderProductDetailByTime(String startTime, String endTime) {
         List<OrderProductDetail> list = orderProductDetailMapper.getByTime(startTime, endTime + " 23:59:59");
-        return (list != null && list.size() > 0)?list:null;
+        return (list != null && list.size() > 0) ? list : null;
     }
 
     @Override
@@ -158,5 +176,27 @@ public class OrderServiceImpl implements OrderServiceIn {
     @Override
     public List<OrderGeneralView> getOrderGeneralViewBy(OrderListBy orderListBy) {
         return orderGeneralViewMapper.getBy(orderListBy);
+    }
+
+    @Override
+    public void insertOrderOperation(Order orderNew) {
+
+
+        String orderCode = orderNew.getCode();
+        Order orderOld = getOrder(orderCode);
+        int action = (int) STATUSTOACTION.get(orderNew.getStatus());
+        OrderOperation orderOperation = new OrderOperation();
+        orderOperation.setOrderCode(orderCode);
+        orderOperation.setAction(action);
+        if (orderOld != null){
+            orderOperation.setOriginStatus(orderOld.getStatus());
+            orderOperation.setChangeAmount(orderNew.getAmount().subtract(orderOld.getAmount()));
+        }
+        orderOperation.setCurrentStatus(orderNew.getStatus());
+        orderOperation.setAmount(orderNew.getAmount());
+        orderOperation.setPayAmount(orderNew.getPayAmount());
+        orderOperation.setFinalAmount(orderNew.getFinalAmount());
+
+        orderOperationMapper.save(orderOperation);
     }
 }

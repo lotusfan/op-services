@@ -56,4 +56,7 @@ public interface OrderServiceIn {
 
     public List<OrderGeneralView> getOrderGeneralViewBy(OrderListBy orderListBy);
 
+    //order日志
+    public void insertOrderOperation(Order orderNew);
+
 }
