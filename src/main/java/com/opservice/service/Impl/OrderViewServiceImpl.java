@@ -461,8 +461,6 @@ public class OrderViewServiceImpl extends OrderServiceParent implements OrderVie
             order.setRemarks(orderDetailView.getRemarks());
             if (orderDetailView.getSourceOrderTime() != null && orderDetailView.getSourceOrderTime().length() > 0){
                 order.setPayTime(new Timestamp(sdf.parse(orderDetailView.getSourceOrderTime()).getTime())); //支付时间--下单时间
-            }else {
-                order.setPayTime(new Timestamp(sdf.parse("0000-00-00 00:00:00").getTime())); //默认时间
             }
             order.setStatus(orderDetailView.getStatus());//订单状态（创建）
             order.setCreateTime(new Timestamp(System.currentTimeMillis()));
@@ -477,8 +475,6 @@ public class OrderViewServiceImpl extends OrderServiceParent implements OrderVie
             orderSubsidiary.setFlightNum(orderDetailView.getFlightNum());
             if (orderDetailView.getFlightTime() != null && orderDetailView.getFlightTime().length() > 0){
                 orderSubsidiary.setFlightTime(new Timestamp(sdf.parse(orderDetailView.getFlightTime()).getTime()));
-            }else {
-                orderSubsidiary.setFlightTime(new Timestamp(0L));
             }
             orderSubsidiary.setOrderSource(orderDetailView.getOrderSource());
             orderSubsidiary.setOutId(orderDetailView.getOutId());
@@ -488,8 +484,6 @@ public class OrderViewServiceImpl extends OrderServiceParent implements OrderVie
             orderSubsidiary.setRemind(orderDetailView.getRemind());
             if (orderDetailView.getSourceOrderTime() != null && orderDetailView.getSourceOrderTime().length() > 0){
                 orderSubsidiary.setSourceOrderTime(new Timestamp(sdf.parse(orderDetailView.getSourceOrderTime()).getTime()));
-            }else {
-                orderSubsidiary.setSourceOrderTime(new Timestamp(0L));
             }
             orderSubsidiary.setTask(orderDetailView.getTask());
 //            orderSubsidiary.setOrderPics(ORDERPICPREFIX + orderDetailView.getOrderPics());
@@ -561,8 +555,6 @@ public class OrderViewServiceImpl extends OrderServiceParent implements OrderVie
                 }
                 orderProductDetail.setPayAmount(amount);
             }
-        }else {
-            orderProductDetail.setUseTime(new Timestamp(0L));
         }
         //数据持久
         if (flag) {
